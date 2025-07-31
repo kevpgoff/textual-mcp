@@ -55,14 +55,6 @@ class TestConfigClasses:
         """Test SearchConfig default values."""
         config = SearchConfig()
 
-        assert config.default_limit == 10
-        assert config.similarity_threshold == 0.7
-        assert config.auto_index is True
-
-    def test_search_config_defaults(self):
-        """Test SearchConfig default values."""
-        config = SearchConfig()
-
         assert config.auto_index is True
         assert config.embeddings_model == "BAAI/bge-base-en-v1.5"
         assert config.persist_path == "./data/textual_docs.db"

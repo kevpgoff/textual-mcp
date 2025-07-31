@@ -150,10 +150,14 @@ def _get_env_overrides() -> Dict[str, Any]:
 
     # Search configuration
     if os.getenv("EMBEDDINGS_MODEL"):
-        overrides.setdefault("search", {})["embeddings_model"] = os.getenv("EMBEDDINGS_MODEL")
-    
+        overrides.setdefault("search", {})["embeddings_model"] = os.getenv(
+            "EMBEDDINGS_MODEL"
+        )
+
     if os.getenv("EMBEDDINGS_STORE"):
-        overrides.setdefault("search", {})["persist_path"] = os.getenv("EMBEDDINGS_STORE")
+        overrides.setdefault("search", {})["persist_path"] = os.getenv(
+            "EMBEDDINGS_STORE"
+        )
 
     # Logging configuration
     if os.getenv("LOG_LEVEL"):

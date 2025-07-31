@@ -7,7 +7,7 @@ name = "textual-mcp-server"
 version = "0.1.0"
 description = "Model Context Protocol server for Textual TUI framework with vector search"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = "MIT"
 authors = [
     { name = "Kevin Goff", email = "kevinpgoff98@gmail.com" }
@@ -47,14 +47,14 @@ packages = ["src/textual_mcp"]
 
 [tool.black]
 line-length = 88
-target-version = ['py311']
+target-version = ['py312']
 
 [tool.ruff]
 line-length = 88
-target-version = "py311"
+target-version = "py312"
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

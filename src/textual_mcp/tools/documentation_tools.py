@@ -2,10 +2,11 @@
 
 import time
 import os
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Annotated
 from pathlib import Path
 import asyncio
 import httpx
+from pydantic import Field
 
 from ..config import TextualMCPConfig
 from ..utils.logging_config import log_tool_execution, log_tool_completion, get_logger
@@ -141,10 +142,35 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
 
     @mcp.tool()
     async def search_textual_docs(
-        query: str,
-        limit: int = 10,
-        content_type: Optional[List[str]] = None,
-        doc_path_pattern: Optional[str] = None,
+        query: Annotated[
+            str,
+            Field(
+                description="Search query for Textual documentation. Can include widget names, CSS properties, concepts, or code patterns.",
+                min_length=1,
+                max_length=200,
+            ),
+        ],
+        limit: Annotated[
+            int,
+            Field(
+                description="Maximum number of search results to return.", ge=1, le=50
+            ),
+        ] = 10,
+        content_type: Annotated[
+            Optional[List[str]],
+            Field(
+                description="Filter by content types: 'guide' (guides and tutorials), 'api' (API reference), 'example' (code examples), 'widget' (widget documentation).",
+                min_items=1,
+                max_items=4,
+            ),
+        ] = None,
+        doc_path_pattern: Annotated[
+            Optional[str],
+            Field(
+                description="Filter by document path pattern using wildcards (e.g., '/docs/guide/*' for guide pages, '/docs/widgets/*' for widget docs).",
+                pattern=r"^[/\w\-*]+$",
+            ),
+        ] = None,
     ) -> Dict[str, Any]:
         """
         Search Textual documentation using semantic search powered by VectorDB.
@@ -212,7 +238,14 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
             raise ToolExecutionError(tool_name, error_msg)
 
     @mcp.tool()
-    async def index_textual_docs(force_reindex: bool = False) -> Dict[str, Any]:
+    async def index_textual_docs(
+        force_reindex: Annotated[
+            bool,
+            Field(
+                description="Force reindexing even if documentation is already indexed. Use True to update with latest documentation changes."
+            ),
+        ] = False,
+    ) -> Dict[str, Any]:
         """
         Index or reindex Textual documentation from GitHub.
 
@@ -304,7 +337,27 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
 
     @mcp.tool()
     async def search_textual_code_examples(
-        query: str, widget_type: Optional[str] = None, limit: int = 10
+        query: Annotated[
+            str,
+            Field(
+                description="Search query for code examples. Include specific patterns, methods, or functionality you're looking for.",
+                min_length=1,
+                max_length=200,
+            ),
+        ],
+        widget_type: Annotated[
+            Optional[str],
+            Field(
+                description="Filter by specific Textual widget type (e.g., 'Button', 'DataTable', 'Tree'). Case-insensitive.",
+                pattern=r"^[A-Za-z][A-Za-z0-9]*$",
+            ),
+        ] = None,
+        limit: Annotated[
+            int,
+            Field(
+                description="Maximum number of code examples to return.", ge=1, le=20
+            ),
+        ] = 10,
     ) -> Dict[str, Any]:
         """
         Search specifically for code examples in Textual documentation.

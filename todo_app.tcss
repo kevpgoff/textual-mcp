@@ -1,0 +1,69 @@
+/* Styles for the TODO list application */
+
+Screen {
+    background: $background;
+}
+
+#app-container {
+    padding: 1 2;
+    width: 100%;
+    height: 100%;
+}
+
+#todo-input {
+    width: 100%;
+    margin-bottom: 1;
+    border: tall $primary;
+}
+
+#button-container {
+    height: auto;
+    margin-bottom: 1;
+    width: 100%;
+}
+
+#button-container Button {
+    margin-right: 1;
+}
+
+#todo-list {
+    width: 100%;
+    height: 1fr;
+    border: tall $primary;
+    background: $surface;
+}
+
+TodoItem {
+    padding: 1 2;
+    border-bottom: solid $panel-lighten-1;
+    height: auto;
+}
+
+TodoItem:hover {
+    background: $panel-darken-1;
+}
+
+TodoItem:focus {
+    background: $primary-background;
+}
+
+TodoItem.completed {
+    text-style: italic strike;
+    color: $text-disabled;
+}
+
+TodoItem.completed Label {
+    text-style: italic strike;
+    color: $text-disabled;
+}
+
+/* Dark mode overrides */
+.dark {
+    TodoItem.completed {
+        color: $text-muted;
+    }
+    
+    TodoItem.completed Label {
+        color: $text-muted;
+    }
+}

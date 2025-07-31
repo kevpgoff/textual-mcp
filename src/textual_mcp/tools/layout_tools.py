@@ -1,7 +1,8 @@
 """MCP tools for layout generation and assistance."""
 
 import time
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Annotated
+from pydantic import Field
 
 from ..config import TextualMCPConfig
 from ..utils.logging_config import log_tool_execution, log_tool_completion, get_logger
@@ -15,10 +16,35 @@ def register_layout_tools(mcp: Any, config: TextualMCPConfig) -> None:
 
     @mcp.tool()
     async def generate_grid_layout(
-        rows: int,
-        columns: int,
-        gap: Optional[str] = None,
-        areas: Optional[List[str]] = None,
+        rows: Annotated[
+            int,
+            Field(
+                description="Number of grid rows to create in the layout.", ge=1, le=20
+            ),
+        ],
+        columns: Annotated[
+            int,
+            Field(
+                description="Number of grid columns to create in the layout.",
+                ge=1,
+                le=20,
+            ),
+        ],
+        gap: Annotated[
+            Optional[str],
+            Field(
+                description="Gap between grid items (e.g., '1' for 1 unit gap, '2 1' for 2 vertical and 1 horizontal gap). Uses Textual spacing units.",
+                pattern=r"^\d+(\s+\d+)?$",
+            ),
+        ] = None,
+        areas: Annotated[
+            Optional[List[str]],
+            Field(
+                description="List of grid area definitions for named grid areas. Each string defines areas for a row (e.g., ['header header', 'sidebar content']).",
+                min_items=0,
+                max_items=20,
+            ),
+        ] = None,
     ) -> Dict[str, Any]:
         """
         Generate grid layout CSS for Textual.

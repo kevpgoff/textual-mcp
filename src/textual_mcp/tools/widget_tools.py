@@ -2,7 +2,8 @@
 
 import time
 import inspect
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Annotated
+from pydantic import Field
 
 from ..config import TextualMCPConfig
 from ..utils.logging_config import log_tool_execution, log_tool_completion, get_logger
@@ -17,10 +18,36 @@ def register_widget_tools(mcp: Any, config: TextualMCPConfig) -> None:
 
     @mcp.tool()
     async def generate_widget(
-        widget_name: str,
-        widget_type: str,
-        includes_css: bool = True,
-        event_handlers: Optional[List[str]] = None,
+        widget_name: Annotated[
+            str,
+            Field(
+                description="Name of the widget class to generate (e.g., 'CustomButton', 'StatusPanel'). Must follow PascalCase Python class naming conventions.",
+                pattern=r"^[A-Z][a-zA-Z0-9]*$",
+                min_length=1,
+                max_length=50,
+            ),
+        ],
+        widget_type: Annotated[
+            str,
+            Field(
+                description="Type of widget to generate: 'container' (holds other widgets), 'input' (user input), 'display' (show content), or 'interactive' (buttons, links).",
+                pattern=r"^(container|input|display|interactive)$",
+            ),
+        ],
+        includes_css: Annotated[
+            bool,
+            Field(
+                description="Whether to include a CSS template with the widget. Set to True for widgets that need custom styling."
+            ),
+        ] = True,
+        event_handlers: Annotated[
+            Optional[List[str]],
+            Field(
+                description="List of event handlers to include (e.g., ['click', 'key_press', 'focus']). Use list_event_handlers tool to see all available options.",
+                min_items=0,
+                max_items=10,
+            ),
+        ] = None,
     ) -> Dict[str, Any]:
         """
         Generate a custom Textual widget.
@@ -250,7 +277,16 @@ def register_widget_tools(mcp: Any, config: TextualMCPConfig) -> None:
             raise ToolExecutionError(tool_name, error_msg)
 
     @mcp.tool()
-    async def validate_widget_name(widget_name: str) -> Dict[str, Any]:
+    async def validate_widget_name(
+        widget_name: Annotated[
+            str,
+            Field(
+                description="The widget name to validate against Python class naming conventions. Should be PascalCase without spaces or special characters.",
+                min_length=1,
+                max_length=100,
+            ),
+        ],
+    ) -> Dict[str, Any]:
         """
         Validate a widget name for Python class naming conventions.
 

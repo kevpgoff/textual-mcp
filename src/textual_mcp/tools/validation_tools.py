@@ -1,8 +1,9 @@
 """MCP tools for CSS validation using Textual's native parser."""
 
 import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Annotated
 from pathlib import Path
+from pydantic import Field
 
 from ..validators.tcss_validator import TCSSValidator
 from ..validators.inline_validator import InlineValidator
@@ -24,11 +25,38 @@ def register_validation_tools(mcp: Any, config: TextualMCPConfig) -> None:
 
     @mcp.tool()
     async def validate_tcss(
-        css_content: str,
-        filename: Optional[str] = None,
-        strict_mode: bool = False,
-        check_performance: bool = True,
-        check_selectors: bool = True,
+        css_content: Annotated[
+            str,
+            Field(
+                description="The Textual CSS content to validate. Can include selectors, properties, and nested rules.",
+                min_length=1,
+            ),
+        ],
+        filename: Annotated[
+            Optional[str],
+            Field(
+                description="Optional filename for better error reporting. Used to provide context in error messages.",
+                pattern=r".*\.(tcss|css)$",
+            ),
+        ] = None,
+        strict_mode: Annotated[
+            bool,
+            Field(
+                description="Enable strict validation mode. When True, warnings are treated as errors and additional checks are performed."
+            ),
+        ] = False,
+        check_performance: Annotated[
+            bool,
+            Field(
+                description="Check for potential performance issues such as inefficient selectors or expensive property combinations."
+            ),
+        ] = True,
+        check_selectors: Annotated[
+            bool,
+            Field(
+                description="Validate selector syntax and check for common selector mistakes or anti-patterns."
+            ),
+        ] = True,
     ) -> Dict[str, Any]:
         """
         Validate Textual CSS content using the native parser.
@@ -108,7 +136,26 @@ def register_validation_tools(mcp: Any, config: TextualMCPConfig) -> None:
 
     @mcp.tool()
     async def validate_tcss_file(
-        file_path: str, strict_mode: bool = False, check_performance: bool = True
+        file_path: Annotated[
+            str,
+            Field(
+                description="Path to the TCSS file to validate. Can be absolute or relative path.",
+                min_length=1,
+                pattern=r".*\.(tcss|css)$",
+            ),
+        ],
+        strict_mode: Annotated[
+            bool,
+            Field(
+                description="Enable strict validation mode. When True, warnings are treated as errors and additional checks are performed."
+            ),
+        ] = False,
+        check_performance: Annotated[
+            bool,
+            Field(
+                description="Check for potential performance issues such as inefficient selectors or expensive property combinations."
+            ),
+        ] = True,
     ) -> Dict[str, Any]:
         """
         Validate a TCSS file.
@@ -202,7 +249,15 @@ def register_validation_tools(mcp: Any, config: TextualMCPConfig) -> None:
             raise ToolExecutionError(tool_name, error_msg)
 
     @mcp.tool()
-    async def validate_inline_styles(style_string: str) -> Dict[str, Any]:
+    async def validate_inline_styles(
+        style_string: Annotated[
+            str,
+            Field(
+                description="CSS declarations string to validate (e.g., 'color: red; margin: 10px;'). Should contain property-value pairs separated by semicolons.",
+                min_length=1,
+            ),
+        ],
+    ) -> Dict[str, Any]:
         """
         Validate inline style declarations.
 
@@ -256,7 +311,16 @@ def register_validation_tools(mcp: Any, config: TextualMCPConfig) -> None:
             raise ToolExecutionError(tool_name, error_msg)
 
     @mcp.tool()
-    async def check_selector(selector: str) -> Dict[str, Any]:
+    async def check_selector(
+        selector: Annotated[
+            str,
+            Field(
+                description="CSS selector string to validate (e.g., '.class', '#id', 'Widget.class', 'Container > Button'). Supports Textual-specific selectors.",
+                min_length=1,
+                max_length=500,
+            ),
+        ],
+    ) -> Dict[str, Any]:
         """
         Validate a single CSS selector.
 

@@ -1,7 +1,8 @@
 """MCP tools for CSS analysis and code inspection."""
 
 import time
-from typing import Dict, Any
+from typing import Dict, Any, Annotated
+from pydantic import Field
 
 from ..config import TextualMCPConfig
 from ..utils.logging_config import log_tool_execution, log_tool_completion, get_logger
@@ -14,7 +15,15 @@ def register_analysis_tools(mcp: Any, config: TextualMCPConfig) -> None:
     logger = get_logger("analysis_tools")
 
     @mcp.tool()
-    async def analyze_selectors(css_content: str) -> Dict[str, Any]:
+    async def analyze_selectors(
+        css_content: Annotated[
+            str,
+            Field(
+                description="The Textual CSS content to analyze for selector patterns, specificity, and complexity metrics.",
+                min_length=1,
+            ),
+        ],
+    ) -> Dict[str, Any]:
         """
         Analyze selector usage and specificity in CSS content.
 
@@ -59,7 +68,15 @@ def register_analysis_tools(mcp: Any, config: TextualMCPConfig) -> None:
             raise ToolExecutionError(tool_name, error_msg)
 
     @mcp.tool()
-    async def extract_css_variables(css_content: str) -> Dict[str, Any]:
+    async def extract_css_variables(
+        css_content: Annotated[
+            str,
+            Field(
+                description="The Textual CSS content to scan for CSS variable definitions (--variable-name) and their usage patterns via var() function.",
+                min_length=1,
+            ),
+        ],
+    ) -> Dict[str, Any]:
         """
         Extract CSS variables and analyze their usage.
 
@@ -96,7 +113,15 @@ def register_analysis_tools(mcp: Any, config: TextualMCPConfig) -> None:
             raise ToolExecutionError(tool_name, error_msg)
 
     @mcp.tool()
-    async def detect_style_conflicts(css_content: str) -> Dict[str, Any]:
+    async def detect_style_conflicts(
+        css_content: Annotated[
+            str,
+            Field(
+                description="The Textual CSS content to analyze for potential conflicts, overlapping selectors, and specificity issues that may cause unexpected styling behavior.",
+                min_length=1,
+            ),
+        ],
+    ) -> Dict[str, Any]:
         """
         Detect potential style conflicts in CSS.
 

@@ -160,8 +160,8 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
             Optional[List[str]],
             Field(
                 description="Filter by content types: 'guide' (guides and tutorials), 'api' (API reference), 'example' (code examples), 'widget' (widget documentation).",
-                min_items=1,
-                max_items=4,
+                min_length=1,
+                max_length=4,
             ),
         ] = None,
         doc_path_pattern: Annotated[

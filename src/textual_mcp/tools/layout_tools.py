@@ -41,8 +41,8 @@ def register_layout_tools(mcp: Any, config: TextualMCPConfig) -> None:
             Optional[List[str]],
             Field(
                 description="List of grid area definitions for named grid areas. Each string defines areas for a row (e.g., ['header header', 'sidebar content']).",
-                min_items=0,
-                max_items=20,
+                min_length=0,
+                max_length=20,
             ),
         ] = None,
     ) -> Dict[str, Any]:

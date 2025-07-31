@@ -44,8 +44,8 @@ def register_widget_tools(mcp: Any, config: TextualMCPConfig) -> None:
             Optional[List[str]],
             Field(
                 description="List of event handlers to include (e.g., ['click', 'key_press', 'focus']). Use list_event_handlers tool to see all available options.",
-                min_items=0,
-                max_items=10,
+                min_length=0,
+                max_length=10,
             ),
         ] = None,
     ) -> Dict[str, Any]:

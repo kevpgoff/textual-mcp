@@ -26,6 +26,7 @@ dependencies = [
     "pyyaml>=6.0.2",
     "sentence-transformers>=5.0.0",
     "spacy>=3.8.7",
+    "tensorflow-hub>=0.16.1",
     "textual>=5.1.0",
     "vectordb2>=0.1.9",
 ]

@@ -6,7 +6,7 @@ import json
 import sys
 from pathlib import Path
 from typing import Optional, Dict, Any
-from datetime import datetime
+from datetime import datetime, UTC
 
 from ..config import LoggingConfig
 
@@ -17,7 +17,7 @@ class JSONFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         """Format log record as JSON."""
         log_entry = {
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now(UTC),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),

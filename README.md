@@ -62,7 +62,7 @@ cp .env.example .env
 fastmcp install claude-desktop server.py --name "Textual MCP"
 ```
 
-### Install in Claude Code  
+### Install in Claude Code
 ```bash
 fastmcp install claude-code server.py --name "Textual MCP"
 ```
@@ -231,16 +231,16 @@ The Textual MCP Server includes semantic search capabilities for Textual documen
 
 1. **GitHub Token** (Required for indexing):
    The documentation indexing requires a GitHub token to avoid API rate limits.
-   
+
    Create a token at: https://github.com/settings/tokens/new
    - No special permissions needed (public access is sufficient)
    - Just used to increase rate limits from 60 to 5000 requests/hour
-   
+
    Set it via environment variable:
    ```bash
    export GITHUB_TOKEN="your-github-token"
    ```
-   
+
    Or add to `.env` file:
    ```bash
    GITHUB_TOKEN=your-github-token

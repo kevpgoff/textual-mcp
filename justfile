@@ -60,3 +60,31 @@ clean-test:
     rm -rf htmlcov/
     rm -rf .coverage
     rm -rf coverage.xml
+
+# Pre-commit commands
+
+# Install pre-commit hooks
+pre-commit-install:
+    uv run pre-commit install
+
+# Run pre-commit on all files
+pre-commit:
+    uv run pre-commit run --all-files
+
+# Run pre-commit on specific files
+pre-commit-files *files:
+    uv run pre-commit run --files {{files}}
+
+# Update pre-commit hooks to latest versions
+pre-commit-update:
+    uv run pre-commit autoupdate
+
+# Run pre-commit without making changes (for CI)
+pre-commit-check:
+    uv run pre-commit run --all-files --show-diff-on-failure
+
+# Setup development environment (install deps and pre-commit hooks)
+setup:
+    uv sync --all-extras
+    uv run pre-commit install
+    @echo "Development environment ready! Pre-commit hooks installed."

@@ -135,13 +135,13 @@ def main() -> int:
 Examples:
   # Index with default settings
   python -m scripts.index_documentation
-  
+
   # Force reindex with custom embeddings model
   python -m scripts.index_documentation --force --embeddings-model "BAAI/bge-small-en-v1.5"
-  
+
   # Use fast embeddings for quick testing
   python -m scripts.index_documentation --embeddings-model "fast" --persist-path "./test_index.db"
-  
+
   # Provide GitHub token for higher API rate limits
   python -m scripts.index_documentation --github-token "ghp_..." --force
 """,

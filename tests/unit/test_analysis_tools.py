@@ -100,12 +100,12 @@ class TestAnalysisTools:
                 --secondary-color: #6c757d;
                 --spacing-unit: 8px;
             }
-            
+
             Button {
                 background: var(--primary-color);
                 padding: var(--spacing-unit);
             }
-            
+
             .unused {
                 --local-var: red;
             }
@@ -147,19 +147,19 @@ class TestAnalysisTools:
                 background: blue;
                 color: white;
             }
-            
+
             Button {
                 background: red;  /* Conflicts with above */
             }
-            
+
             .primary {
                 color: blue;
             }
-            
+
             Button.primary {
                 color: green;  /* More specific, overrides .primary */
             }
-            
+
             #specific-button {
                 background: yellow;
             }

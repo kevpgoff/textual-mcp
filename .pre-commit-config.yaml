@@ -1,0 +1,39 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.7
+    hooks:
+      - id: ruff
+        name: ruff lint
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+        name: ruff format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.0
+    hooks:
+      - id: mypy
+        name: mypy type checking
+        additional_dependencies:
+          - types-pyyaml>=6.0.12.20250516
+          - pydantic>=2.11.7
+          - textual>=5.1.0
+          - fastmcp>=2.10.6
+          - httpx>=0.28.1
+          - aiofiles>=24.1.0
+          - cachetools>=6.1.0
+          - jinja2>=3.1.6
+          - mistletoe>=1.4.0
+          - pytest>=8.4.1
+          - pytest-asyncio>=1.1.0
+        args: [--config-file=pyproject.toml]
+        files: ^src/
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+      - id: check-merge-conflict

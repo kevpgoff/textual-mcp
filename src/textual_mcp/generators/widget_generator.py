@@ -294,18 +294,18 @@ from textual.reactive import reactive
 
 class {widget_name}(Widget):
     """A custom {widget_type} widget."""
-    
+
     DEFAULT_CSS = """
     {widget_name} {{
         /* Widget styles will be defined here */
     }}
     """
-    
+
     def __init__(self, **kwargs):
         """Initialize the {widget_name} widget."""
         super().__init__(**kwargs)
         self.setup_widget()
-    
+
     def setup_widget(self) -> None:
         """Set up widget-specific configuration."""
         pass
@@ -313,11 +313,11 @@ class {widget_name}(Widget):
 {compose_method}
 {render_method}
 {event_methods}
-    
+
     def on_mount(self) -> None:
         """Called when widget is mounted."""
         pass
-    
+
     def on_unmount(self) -> None:
         """Called when widget is unmounted."""
         pass

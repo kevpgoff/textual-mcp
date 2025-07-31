@@ -102,14 +102,14 @@ class GridApp(App):
     .grid-container {{
 {css}
     }}
-    
+
     .grid-item {{
         border: solid $primary;
         padding: 1;
         text-align: center;
     }}
     """
-    
+
     def compose(self) -> ComposeResult:
         with Container(classes="grid-container"):
             # Generate {total_items} grid items ({rows} rows x {columns} columns)

@@ -1,0 +1,73 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "textual-mcp-server"
+version = "0.1.0"
+description = "Model Context Protocol server for Textual TUI framework with vector search"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+    { name = "Kevin Goff", email = "kevinpgoff98@gmail.com" }
+]
+dependencies = [
+    "aiofiles>=24.1.0",
+    "cachetools>=6.1.0",
+    "fastmcp>=2.10.6",
+    "httpx>=0.28.1",
+    "jinja2>=3.1.6",
+    "numpy>=2.3.2",
+    "pydantic>=2.11.7",
+    "pyyaml>=6.0.2",
+    "qdrant-client>=1.15.0",
+    "sentence-transformers>=5.0.0",
+    "textual>=5.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+
+]
+
+[project.scripts]
+textual-mcp = "textual_mcp.server:main"
+textual-mcp-index = "scripts.index_documentation:main"
+
+[tool.hatch.build]
+include = ["src/textual_mcp"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/textual_mcp"]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=textual_mcp --cov-report=term-missing"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.17.0",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "pytest-cov>=6.2.1",
+    "ruff>=0.12.7",
+    "types-pyyaml>=6.0.12.20250516",
+]

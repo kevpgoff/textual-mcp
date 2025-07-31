@@ -1,0 +1,45 @@
+# Textual MCP Server Configuration
+validators:
+  strict_mode: false
+  cache_enabled: true
+  max_file_size: 1048576  # 1MB
+  timeout: 30
+
+vector_store:
+  provider: qdrant
+  url: http://localhost:6333
+  collection: textual_docs
+  api_key: null  # Set via QDRANT_API_KEY environment variable
+  
+  embedding:
+    model: all-MiniLM-L6-v2
+    dimension: 384
+    batch_size: 32
+  
+  indexing:
+    chunk_size: 512
+    chunk_overlap: 50
+    doc_types:
+      - api
+      - guide
+      - example
+      - css_reference
+  
+  search:
+    default_limit: 5
+    similarity_threshold: 0.7
+    rerank: true
+
+performance:
+  cache_size: 100
+  timeout: 30
+  max_concurrent_requests: 10
+
+logging:
+  level: INFO
+  format: json
+  file: textual-mcp.log
+
+features:
+  experimental: false
+  plugins_enabled: true

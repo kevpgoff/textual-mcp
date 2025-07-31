@@ -15,15 +15,19 @@ authors = [
 dependencies = [
     "aiofiles>=24.1.0",
     "cachetools>=6.1.0",
+    "en-core-web-sm",
     "fastmcp>=2.10.6",
     "httpx>=0.28.1",
     "jinja2>=3.1.6",
-    "numpy>=2.3.2",
+    "mistletoe>=1.4.0",
+    "mrpt>=2.0.2",
+    "numpy<2.0.0",
     "pydantic>=2.11.7",
     "pyyaml>=6.0.2",
-    "qdrant-client>=1.15.0",
     "sentence-transformers>=5.0.0",
-    "textual>=5.0.1",
+    "spacy>=3.8.7",
+    "textual>=5.1.0",
+    "vectordb2>=0.1.9",
 ]
 
 [project.optional-dependencies]
@@ -54,6 +58,7 @@ python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+mypy_path = "stubs"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -61,6 +66,9 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --cov=textual_mcp --cov-report=term-missing"
+
+[tool.uv.sources]
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }
 
 [dependency-groups]
 dev = [

@@ -13,7 +13,10 @@ from textual_mcp.tools.validation_tools import register_validation_tools
 from textual_mcp.tools.analysis_tools import register_analysis_tools
 from textual_mcp.tools.widget_tools import register_widget_tools
 from textual_mcp.tools.layout_tools import register_layout_tools
-from textual_mcp.tools.documentation_tools import register_documentation_tools
+from textual_mcp.tools.documentation_tools import (
+    register_documentation_tools,
+    get_docs_memory,
+)
 
 
 class TextualMCPServer:
@@ -31,6 +34,20 @@ class TextualMCPServer:
 
         # Register all tools
         self._register_tools()
+
+        # Initialize documentation search if enabled
+        if config.search.auto_index:
+            try:
+                # This will trigger auto-indexing if needed
+                memory = get_docs_memory(config)
+                if not memory.is_indexed():
+                    self.logger.info(
+                        "Documentation search will be indexed on first use"
+                    )
+                else:
+                    self.logger.info("Documentation search index is ready")
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize documentation search: {e}")
 
         self.logger.info("Textual MCP Server initialized")
 

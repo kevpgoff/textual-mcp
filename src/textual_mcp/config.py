@@ -4,7 +4,7 @@ import os
 import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional, List
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 
 class ValidatorConfig(BaseModel):
@@ -35,23 +35,16 @@ class IndexingConfig(BaseModel):
 
 
 class SearchConfig(BaseModel):
-    """Configuration for vector search."""
+    """Configuration for documentation search functionality."""
 
-    default_limit: int = 5
+    auto_index: bool = True
+    embeddings_model: str = "BAAI/bge-base-en-v1.5"
+    persist_path: Optional[str] = "./data/textual_docs.db"
+    chunk_size: int = 200
+    chunk_overlap: int = 20
+    github_token: Optional[str] = None
+    default_limit: int = 10
     similarity_threshold: float = 0.7
-    rerank: bool = True
-
-
-class VectorStoreConfig(BaseModel):
-    """Configuration for vector store."""
-
-    provider: str = "qdrant"
-    url: str = "http://localhost:6333"
-    collection: str = "textual_docs"
-    api_key: Optional[str] = None
-    embedding: EmbeddingConfig = Field(default_factory=EmbeddingConfig)
-    indexing: IndexingConfig = Field(default_factory=IndexingConfig)
-    search: SearchConfig = Field(default_factory=SearchConfig)
 
 
 class PerformanceConfig(BaseModel):
@@ -81,18 +74,10 @@ class TextualMCPConfig(BaseModel):
     """Main configuration class for Textual MCP Server."""
 
     validators: ValidatorConfig = Field(default_factory=ValidatorConfig)
-    vector_store: VectorStoreConfig = Field(default_factory=VectorStoreConfig)
+    search: SearchConfig = Field(default_factory=SearchConfig)
     performance: PerformanceConfig = Field(default_factory=PerformanceConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
     features: FeaturesConfig = Field(default_factory=FeaturesConfig)
-
-    @field_validator("vector_store")
-    @classmethod
-    def validate_vector_store_url(cls, v: VectorStoreConfig) -> VectorStoreConfig:
-        """Validate vector store URL."""
-        if not v.url.startswith(("http://", "https://")):
-            raise ValueError("Vector store URL must start with http:// or https://")
-        return v
 
 
 def get_default_config_path() -> Path:
@@ -149,19 +134,26 @@ def _get_env_overrides() -> Dict[str, Any]:
     """Get configuration overrides from environment variables."""
     overrides: Dict[str, Any] = {}
 
-    # Vector store configuration
-    if os.getenv("QDRANT_URL"):
-        overrides.setdefault("vector_store", {})["url"] = os.getenv("QDRANT_URL")
-
-    if os.getenv("QDRANT_API_KEY"):
-        overrides.setdefault("vector_store", {})["api_key"] = os.getenv(
-            "QDRANT_API_KEY"
+    # Search configuration
+    if os.getenv("TEXTUAL_SEARCH_EMBEDDINGS_MODEL"):
+        overrides.setdefault("search", {})["embeddings_model"] = os.getenv(
+            "TEXTUAL_SEARCH_EMBEDDINGS_MODEL"
         )
 
-    if os.getenv("QDRANT_COLLECTION"):
-        overrides.setdefault("vector_store", {})["collection"] = os.getenv(
-            "QDRANT_COLLECTION"
+    if os.getenv("TEXTUAL_SEARCH_PERSIST_PATH"):
+        overrides.setdefault("search", {})["persist_path"] = os.getenv(
+            "TEXTUAL_SEARCH_PERSIST_PATH"
         )
+
+    if os.getenv("GITHUB_TOKEN"):
+        overrides.setdefault("search", {})["github_token"] = os.getenv("GITHUB_TOKEN")
+
+    # Search configuration
+    if os.getenv("EMBEDDINGS_MODEL"):
+        overrides.setdefault("search", {})["embeddings_model"] = os.getenv("EMBEDDINGS_MODEL")
+    
+    if os.getenv("EMBEDDINGS_STORE"):
+        overrides.setdefault("search", {})["persist_path"] = os.getenv("EMBEDDINGS_STORE")
 
     # Logging configuration
     if os.getenv("LOG_LEVEL"):
@@ -215,7 +207,7 @@ def save_config(config: TextualMCPConfig, config_path: Optional[str] = None) -> 
     path.parent.mkdir(parents=True, exist_ok=True)
 
     # Convert to dictionary and save
-    config_dict = config.dict()
+    config_dict = config.model_dump()
 
     with open(path, "w") as f:
         yaml.dump(config_dict, f, default_flow_style=False, indent=2)

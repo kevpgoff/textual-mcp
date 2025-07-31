@@ -9,7 +9,6 @@ import yaml
 from textual_mcp.config import (
     TextualMCPConfig,
     ValidatorConfig,
-    VectorStoreConfig,
     PerformanceConfig,
     LoggingConfig,
     FeaturesConfig,
@@ -56,39 +55,32 @@ class TestConfigClasses:
         """Test SearchConfig default values."""
         config = SearchConfig()
 
-        assert config.default_limit == 5
+        assert config.default_limit == 10
         assert config.similarity_threshold == 0.7
-        assert config.rerank is True
+        assert config.auto_index is True
 
-    def test_vector_store_config_defaults(self):
-        """Test VectorStoreConfig default values."""
-        config = VectorStoreConfig()
+    def test_search_config_defaults(self):
+        """Test SearchConfig default values."""
+        config = SearchConfig()
 
-        assert config.provider == "qdrant"
-        assert config.url == "http://localhost:6333"
-        assert config.collection == "textual_docs"
-        assert config.api_key is None
-        assert isinstance(config.embedding, EmbeddingConfig)
-        assert isinstance(config.indexing, IndexingConfig)
-        assert isinstance(config.search, SearchConfig)
+        assert config.auto_index is True
+        assert config.embeddings_model == "BAAI/bge-base-en-v1.5"
+        assert config.persist_path == "./data/textual_docs.db"
+        assert config.chunk_size == 200
+        assert config.chunk_overlap == 20
+        assert config.github_token is None
+        assert config.default_limit == 10
+        assert config.similarity_threshold == 0.7
 
-    def test_vector_store_url_validation(self):
-        """Test VectorStoreConfig URL validation."""
-        # Valid URLs
-        config = VectorStoreConfig(url="http://localhost:6333")
-        assert config.url == "http://localhost:6333"
+    def test_search_config_persistence(self):
+        """Test SearchConfig persist_path configuration."""
+        # Test with custom persist path
+        config = SearchConfig(persist_path="/tmp/custom_embeddings.db")
+        assert config.persist_path == "/tmp/custom_embeddings.db"
 
-        config = VectorStoreConfig(url="https://qdrant.example.com")
-        assert config.url == "https://qdrant.example.com"
-
-        # Test invalid URL - check if it raises or accepts it
-        try:
-            config = VectorStoreConfig(url="localhost:6333")
-            # If it doesn't raise, that's ok for now
-            assert config.url == "localhost:6333"
-        except ValueError as e:
-            # If it does raise, check the error message
-            assert "must start with http:// or https://" in str(e)
+        # Test with None (in-memory)
+        config = SearchConfig(persist_path=None)
+        assert config.persist_path is None
 
     def test_performance_config_defaults(self):
         """Test PerformanceConfig default values."""
@@ -118,7 +110,7 @@ class TestConfigClasses:
         config = TextualMCPConfig()
 
         assert isinstance(config.validators, ValidatorConfig)
-        assert isinstance(config.vector_store, VectorStoreConfig)
+        assert isinstance(config.search, SearchConfig)
         assert isinstance(config.performance, PerformanceConfig)
         assert isinstance(config.logging, LoggingConfig)
         assert isinstance(config.features, FeaturesConfig)
@@ -197,8 +189,9 @@ class TestConfigLoading:
     def test_load_config_with_env_overrides(self, temp_dir: Path):
         """Test loading configuration with environment variable overrides."""
         config_data = {
-            "vector_store": {
-                "url": "http://original:6333",
+            "search": {
+                "persist_path": "./original/path.db",
+                "embeddings_model": "original-model",
             },
             "logging": {
                 "level": "INFO",
@@ -211,7 +204,8 @@ class TestConfigLoading:
 
         # Set environment variables
         env_vars = {
-            "QDRANT_URL": "http://env-override:6333",
+            "EMBEDDINGS_STORE": "/env/override/path.db",
+            "EMBEDDINGS_MODEL": "env-override-model",
             "LOG_LEVEL": "DEBUG",
             "CACHE_SIZE": "200",
         }
@@ -219,7 +213,8 @@ class TestConfigLoading:
         with patch.dict(os.environ, env_vars):
             config = load_config(str(config_file))
 
-        assert config.vector_store.url == "http://env-override:6333"
+        assert config.search.persist_path == "/env/override/path.db"
+        assert config.search.embeddings_model == "env-override-model"
         assert config.logging.level == "DEBUG"
         assert config.performance.cache_size == 200
 
@@ -233,20 +228,20 @@ class TestEnvironmentOverrides:
             overrides = _get_env_overrides()
             assert overrides == {}
 
-    def test_get_env_overrides_vector_store(self):
-        """Test vector store environment overrides."""
+    def test_get_env_overrides_search(self):
+        """Test search environment overrides."""
         env_vars = {
-            "QDRANT_URL": "http://test:6333",
-            "QDRANT_API_KEY": "test-key",
-            "QDRANT_COLLECTION": "test-collection",
+            "EMBEDDINGS_STORE": "/test/embeddings.db",
+            "EMBEDDINGS_MODEL": "test-model",
+            "GITHUB_TOKEN": "test-github-token",
         }
 
         with patch.dict(os.environ, env_vars):
             overrides = _get_env_overrides()
 
-        assert overrides["vector_store"]["url"] == "http://test:6333"
-        assert overrides["vector_store"]["api_key"] == "test-key"
-        assert overrides["vector_store"]["collection"] == "test-collection"
+        assert overrides["search"]["persist_path"] == "/test/embeddings.db"
+        assert overrides["search"]["embeddings_model"] == "test-model"
+        assert overrides["search"]["github_token"] == "test-github-token"
 
     def test_get_env_overrides_logging(self):
         """Test logging environment overrides."""

@@ -159,9 +159,9 @@ class TestMCPIntegration:
                     },
                 )
 
-            assert "Widget name should start with an uppercase letter" in str(
-                exc_info.value
-            )
+            # The error comes from Pydantic validation on the pattern field
+            error_msg = str(exc_info.value)
+            assert "does not match" in error_msg and "^[A-Z][a-zA-Z0-9]*$" in error_msg
 
     @pytest.mark.asyncio
     async def test_list_widget_types_tool(self, mcp_client: Client):

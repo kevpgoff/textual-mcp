@@ -13,6 +13,7 @@ from ..utils.logging_config import log_tool_execution, log_tool_completion, get_
 from ..utils.errors import ToolExecutionError
 from ..search.memory import TextualDocsMemory
 from ..search.document_processor import TextualDocumentProcessor, index_documentation
+from ..utils.style_introspector import StyleIntrospector
 
 
 # Global memory instance
@@ -423,6 +424,190 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
             log_tool_completion(tool_name, False, duration, error_msg)
             raise ToolExecutionError(tool_name, error_msg)
 
+    @mcp.tool()
+    async def get_css_property_info(
+        property_name: Annotated[
+            str,
+            Field(
+                description="CSS property name to get information about (e.g., 'background', 'margin', 'display'). Use hyphens or underscores.",
+                pattern=r"^[a-z][a-z0-9_-]*$",
+                min_length=1,
+                max_length=50,
+            ),
+        ],
+    ) -> Dict[str, Any]:
+        """
+        Get detailed information about a specific Textual CSS property.
+
+        This tool introspects Textual's actual CSS implementation to provide
+        accurate, up-to-date information about CSS properties including their
+        valid values, types, defaults, and usage.
+
+        Args:
+            property_name: Name of the CSS property (e.g., 'background', 'margin-top')
+
+        Returns:
+            Dictionary with comprehensive property information
+        """
+        start_time = time.time()
+        tool_name = "get_css_property_info"
+
+        try:
+            log_tool_execution(tool_name, {"property_name": property_name})
+
+            # Initialize introspector
+            introspector = StyleIntrospector()
+
+            # Get property info
+            prop_info = introspector.get_property_info(property_name)
+
+            response: Dict[str, Any]
+            if not prop_info:
+                # Try to find similar properties
+                all_props = introspector.get_all_properties()
+                similar = [p for p in all_props.keys() if property_name in p or p in property_name]
+
+                response = {
+                    "error": f"Property '{property_name}' not found",
+                    "suggestion": "Use list_css_properties to see all available properties",
+                    "similar_properties": similar[:5] if similar else [],
+                }
+            else:
+                response = {
+                    "name": prop_info.name,
+                    "description": prop_info.description,
+                    "type": prop_info.property_type,
+                    "valid_values": prop_info.valid_values,
+                    "default_value": str(prop_info.default_value)
+                    if prop_info.default_value is not None
+                    else None,
+                    "category": prop_info.category,
+                    "examples": prop_info.examples,
+                    "related_properties": prop_info.related_properties,
+                }
+
+            duration = time.time() - start_time
+            log_tool_completion(tool_name, True, duration)
+
+            return response
+
+        except Exception as e:
+            duration = time.time() - start_time
+            error_msg = f"Failed to get CSS property info: {str(e)}"
+            log_tool_completion(tool_name, False, duration, error_msg)
+            raise ToolExecutionError(tool_name, error_msg)
+
+    @mcp.tool()
+    async def list_css_properties(
+        category: Annotated[
+            Optional[str],
+            Field(
+                description="Filter by category: 'layout', 'sizing', 'appearance', 'borders', 'text', 'overflow', 'grid', 'animation', or 'general'",
+                pattern=r"^(layout|sizing|appearance|borders|text|overflow|grid|animation|general)$",
+            ),
+        ] = None,
+        include_descriptions: Annotated[
+            bool,
+            Field(
+                description="Include brief descriptions for each property. Set to False for a more compact list."
+            ),
+        ] = True,
+    ) -> Dict[str, Any]:
+        """
+        List all available Textual CSS properties, optionally filtered by category.
+
+        This tool provides a comprehensive list of all CSS properties supported
+        by Textual, organized by category for easy browsing.
+
+        Args:
+            category: Optional category filter
+            include_descriptions: Whether to include property descriptions
+
+        Returns:
+            Dictionary with categorized CSS properties
+        """
+        start_time = time.time()
+        tool_name = "list_css_properties"
+
+        try:
+            log_tool_execution(
+                tool_name, {"category": category, "include_descriptions": include_descriptions}
+            )
+
+            # Initialize introspector
+            introspector = StyleIntrospector()
+
+            # Get properties by category
+            categorized = introspector.get_properties_by_category()
+
+            # Build response
+            response: Dict[str, Any]
+            if category:
+                # Filter to specific category
+                if category in categorized:
+                    properties = categorized[category]
+                    prop_list: Union[List[str], List[Dict[str, str]]]
+                    if include_descriptions:
+                        prop_list = [
+                            {
+                                "name": prop.name,
+                                "description": prop.description[:100] + "..."
+                                if len(prop.description) > 100
+                                else prop.description,
+                                "type": prop.property_type,
+                            }
+                            for prop in properties
+                        ]
+                    else:
+                        prop_list = [prop.name for prop in properties]
+
+                    response = {
+                        "category": category,
+                        "properties": prop_list,
+                        "total": len(properties),
+                    }
+                else:
+                    response = {
+                        "error": f"Category '{category}' not found",
+                        "available_categories": list(categorized.keys()),
+                    }
+            else:
+                # Return all categories
+                result: Dict[str, Union[List[str], List[Dict[str, str]]]] = {}
+                total_count = 0
+
+                for cat, props in categorized.items():
+                    if include_descriptions:
+                        result[cat] = [
+                            {
+                                "name": prop.name,
+                                "description": prop.description[:80] + "..."
+                                if len(prop.description) > 80
+                                else prop.description,
+                            }
+                            for prop in props
+                        ]
+                    else:
+                        result[cat] = [prop.name for prop in props]
+                    total_count += len(props)
+
+                response = {
+                    "categories": result,
+                    "total_properties": total_count,
+                    "category_counts": {cat: len(props) for cat, props in categorized.items()},
+                }
+
+            duration = time.time() - start_time
+            log_tool_completion(tool_name, True, duration)
+
+            return response
+
+        except Exception as e:
+            duration = time.time() - start_time
+            error_msg = f"Failed to list CSS properties: {str(e)}"
+            log_tool_completion(tool_name, False, duration, error_msg)
+            raise ToolExecutionError(tool_name, error_msg)
+
     logger.info(
-        "Registered documentation tools: get_widget_docs, get_css_property_docs, search_textual_docs, index_textual_docs, search_textual_code_examples, find_similar_examples"
+        "Registered documentation tools: search_textual_docs, index_textual_docs, search_textual_code_examples, get_css_property_info, list_css_properties"
     )

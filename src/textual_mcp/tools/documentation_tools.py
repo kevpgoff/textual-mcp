@@ -58,13 +58,14 @@ async def initialize_docs_index(memory: TextualDocsMemory, config: TextualMCPCon
         processor = TextualDocumentProcessor(
             chunk_size=config.search.chunk_size,
             chunk_overlap=config.search.chunk_overlap,
+            config=config,
         )
 
         if config.search.github_token:
             processor.set_github_token(config.search.github_token)
 
         # Index documentation
-        stats = await index_documentation(memory, processor)
+        stats = await index_documentation(memory, processor, config)
 
         logger.info(f"Documentation indexing completed. Stats: {stats}")
 
@@ -276,6 +277,7 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
                 processor = TextualDocumentProcessor(
                     chunk_size=config.search.chunk_size,
                     chunk_overlap=config.search.chunk_overlap,
+                    config=config,
                 )
 
                 if config.search.github_token:
@@ -305,7 +307,7 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
                     logger.warning(f"Could not check rate limit: {e}")
 
                 # Index documentation
-                stats = await index_documentation(memory, processor)
+                stats = await index_documentation(memory, processor, config)
 
                 response = {
                     "status": "success",

@@ -14,16 +14,37 @@ from datetime import datetime
 import base64
 
 from ..utils.logging_config import get_logger
+from ..config import TextualMCPConfig
 
 
 class TextualDocumentProcessor:
     """Process Textual documentation for indexing."""
 
-    def __init__(self, chunk_size: int = 200, chunk_overlap: int = 20):
+    def __init__(
+        self,
+        chunk_size: int = 200,
+        chunk_overlap: int = 20,
+        config: Optional[TextualMCPConfig] = None,
+    ):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.github_token: Optional[str] = None  # Optional GitHub token for higher rate limits
         self.logger = get_logger("document_processor")
+        self.config = config
+        self.chonkie_processor = None
+
+        # Initialize Chonkie processor if configured
+        if config and config.search.chunking_strategy == "chonkie":
+            try:
+                from .chonkie_processor import TextualChonkieProcessor
+
+                self.chonkie_processor = TextualChonkieProcessor(config)
+                self.logger.info("Using Chonkie chunking strategy")
+            except ImportError as e:
+                self.logger.warning(
+                    f"Failed to import Chonkie processor: {e}. Falling back to manual chunking."
+                )
+                self.chonkie_processor = None
 
     def set_github_token(self, token: Optional[str]) -> None:
         """Set GitHub token for API access."""
@@ -176,6 +197,16 @@ class TextualDocumentProcessor:
 
     def process_document(self, doc_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Process a single document into chunks."""
+        # Use Chonkie processor if available
+        if self.chonkie_processor:
+            try:
+                return self.chonkie_processor.process_document(doc_data)
+            except Exception as e:
+                self.logger.error(
+                    f"Chonkie processing failed for {doc_data['path']}: {e}. Falling back to manual chunking."
+                )
+
+        # Fall back to manual chunking
         try:
             doc = Document(doc_data["content"])
             chunks = []
@@ -302,11 +333,20 @@ class TextualDocumentProcessor:
 
 
 async def index_documentation(
-    memory: Any, processor: Optional[TextualDocumentProcessor] = None
+    memory: Any,
+    processor: Optional[TextualDocumentProcessor] = None,
+    config: Optional[TextualMCPConfig] = None,
 ) -> Dict[str, Any]:
     """Index Textual documentation into VectorDB."""
     if processor is None:
-        processor = TextualDocumentProcessor()
+        if config:
+            processor = TextualDocumentProcessor(
+                chunk_size=config.search.chunk_size,
+                chunk_overlap=config.search.chunk_overlap,
+                config=config,
+            )
+        else:
+            processor = TextualDocumentProcessor()
 
     logger = get_logger("index_documentation")
     logger.info("Starting documentation indexing")

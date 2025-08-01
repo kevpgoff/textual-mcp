@@ -29,9 +29,7 @@ def get_docs_memory(config: TextualMCPConfig) -> TextualDocsMemory:
         if embeddings_store:
             persist_path = Path(embeddings_store)
         else:
-            persist_path = (
-                Path(config.search.persist_path) if config.search.persist_path else None
-            )
+            persist_path = Path(config.search.persist_path) if config.search.persist_path else None
 
         if persist_path and not persist_path.parent.exists():
             persist_path.parent.mkdir(parents=True, exist_ok=True)
@@ -49,9 +47,7 @@ def get_docs_memory(config: TextualMCPConfig) -> TextualDocsMemory:
     return _docs_memory
 
 
-async def initialize_docs_index(
-    memory: TextualDocsMemory, config: TextualMCPConfig
-) -> None:
+async def initialize_docs_index(memory: TextualDocsMemory, config: TextualMCPConfig) -> None:
     """Initialize the documentation index by fetching and indexing Textual documentation."""
     try:
         logger = get_logger("documentation_index")
@@ -152,9 +148,7 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
         ],
         limit: Annotated[
             int,
-            Field(
-                description="Maximum number of search results to return.", ge=1, le=50
-            ),
+            Field(description="Maximum number of search results to return.", ge=1, le=50),
         ] = 10,
         content_type: Annotated[
             Optional[List[str]],
@@ -295,9 +289,7 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
                     )
 
                     # Warn if rate limit is low
-                    if (
-                        rate_info["remaining"] < 300
-                    ):  # Need ~300 requests for full indexing
+                    if rate_info["remaining"] < 300:  # Need ~300 requests for full indexing
                         reset_time = time.strftime(
                             "%Y-%m-%d %H:%M:%S", time.localtime(rate_info["reset"])
                         )
@@ -354,9 +346,7 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
         ] = None,
         limit: Annotated[
             int,
-            Field(
-                description="Maximum number of code examples to return.", ge=1, le=20
-            ),
+            Field(description="Maximum number of code examples to return.", ge=1, le=20),
         ] = 10,
     ) -> Dict[str, Any]:
         """
@@ -398,9 +388,7 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
 
             # Further filter by widget type if specified
             if widget_type:
-                filtered_results = [
-                    r for r in results if widget_type.lower() in r["text"].lower()
-                ]
+                filtered_results = [r for r in results if widget_type.lower() in r["text"].lower()]
                 results = filtered_results
 
             # Format code examples

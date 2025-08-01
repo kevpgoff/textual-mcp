@@ -41,9 +41,7 @@ class TextualMCPServer:
                 # This will trigger auto-indexing if needed
                 memory = get_docs_memory(config)
                 if not memory.is_indexed():
-                    self.logger.info(
-                        "Documentation search will be indexed on first use"
-                    )
+                    self.logger.info("Documentation search will be indexed on first use")
                 else:
                     self.logger.info("Documentation search index is ready")
             except Exception as e:
@@ -137,9 +135,7 @@ def main() -> None:
         default="INFO",
         help="Log level",
     )
-    parser.add_argument(
-        "--version", action="version", version="Textual MCP Server 1.0.0"
-    )
+    parser.add_argument("--version", action="version", version="Textual MCP Server 1.0.0")
 
     args = parser.parse_args()
 

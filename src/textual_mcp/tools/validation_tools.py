@@ -172,9 +172,7 @@ def register_validation_tools(mcp: Any, config: TextualMCPConfig) -> None:
         tool_name = "validate_tcss_file"
 
         try:
-            log_tool_execution(
-                tool_name, {"file_path": file_path, "strict_mode": strict_mode}
-            )
+            log_tool_execution(tool_name, {"file_path": file_path, "strict_mode": strict_mode})
 
             # Check if file exists
             if not Path(file_path).exists():
@@ -345,9 +343,7 @@ def register_validation_tools(mcp: Any, config: TextualMCPConfig) -> None:
                 "selector": selector,
                 "error": result.error,
                 "type": result.selector_type,
-                "specificity": list(
-                    result.specificity
-                ),  # Convert tuple to list for JSON
+                "specificity": list(result.specificity),  # Convert tuple to list for JSON
             }
 
             duration = time.time() - start_time

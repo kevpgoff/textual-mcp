@@ -22,9 +22,7 @@ class TextualDocumentProcessor:
     def __init__(self, chunk_size: int = 200, chunk_overlap: int = 20):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.github_token: Optional[str] = (
-            None  # Optional GitHub token for higher rate limits
-        )
+        self.github_token: Optional[str] = None  # Optional GitHub token for higher rate limits
         self.logger = get_logger("document_processor")
 
     def set_github_token(self, token: Optional[str]) -> None:
@@ -40,9 +38,7 @@ class TextualDocumentProcessor:
             headers["Authorization"] = f"token {self.github_token}"
 
         async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.get(
-                "https://api.github.com/rate_limit", headers=headers
-            )
+            response = await client.get("https://api.github.com/rate_limit", headers=headers)
             response.raise_for_status()
             data = response.json()
 
@@ -95,12 +91,8 @@ class TextualDocumentProcessor:
                     # Check if we have a token
                     if self.github_token:
                         # Get rate limit info from headers
-                        reset_timestamp = e.response.headers.get(
-                            "X-RateLimit-Reset", "unknown"
-                        )
-                        remaining = e.response.headers.get(
-                            "X-RateLimit-Remaining", "unknown"
-                        )
+                        reset_timestamp = e.response.headers.get("X-RateLimit-Reset", "unknown")
+                        remaining = e.response.headers.get("X-RateLimit-Remaining", "unknown")
 
                         # Convert timestamp to readable format
                         if reset_timestamp != "unknown":
@@ -210,13 +202,9 @@ class TextualDocumentProcessor:
                     # Keep code blocks as single chunks
                     code_content = ""
                     if isinstance(token, CodeFence):
-                        code_content = (
-                            token.children[0].content if token.children else ""
-                        )
+                        code_content = token.children[0].content if token.children else ""
                     elif isinstance(token, BlockCode):
-                        code_content = (
-                            token.children[0].content if token.children else ""
-                        )
+                        code_content = token.children[0].content if token.children else ""
 
                     if code_content.strip():
                         chunks.append(
@@ -342,9 +330,7 @@ async def index_documentation(
         # Index batch when it reaches the size limit
         if len(batch) >= batch_size:
             await memory.index_documents(batch)
-            logger.info(
-                f"Indexed batch: {len(batch)} chunks from {total_docs} documents"
-            )
+            logger.info(f"Indexed batch: {len(batch)} chunks from {total_docs} documents")
             batch = []
 
     # Index remaining documents

@@ -139,14 +139,10 @@ class TestValidationTools:
 
         assert result["valid"] is False
         assert len(result["errors"]) > 0
-        assert any(
-            "not found" in error["message"].lower() for error in result["errors"]
-        )
+        assert any("not found" in error["message"].lower() for error in result["errors"])
 
     @pytest.mark.asyncio
-    async def test_validate_inline_styles_tool_logic(
-        self, test_config: TextualMCPConfig
-    ):
+    async def test_validate_inline_styles_tool_logic(self, test_config: TextualMCPConfig):
         """Test the validate_inline_styles tool implementation logic."""
         mock_mcp = MagicMock()
         registered_tools = {}
@@ -250,9 +246,7 @@ class TestValidationTools:
 
         # We need to mock the tcss_validator instance that was created during registration
         # Since it's created in the closure, we need to patch it at module level
-        with patch.object(
-            test_config.validators, "strict_mode", False
-        ):  # Ensure config matches
+        with patch.object(test_config.validators, "strict_mode", False):  # Ensure config matches
             # Re-register to get a fresh instance
             mock_mcp2 = MagicMock()
             registered_tools2 = {}
@@ -267,9 +261,7 @@ class TestValidationTools:
             mock_mcp2.tool = tool_decorator2
 
             # Patch TCSSValidator to raise exception when instantiated
-            with patch(
-                "textual_mcp.tools.validation_tools.TCSSValidator"
-            ) as mock_validator_class:
+            with patch("textual_mcp.tools.validation_tools.TCSSValidator") as mock_validator_class:
                 mock_validator = MagicMock()
                 mock_validator.validate.side_effect = Exception("Validation error")
                 mock_validator_class.return_value = mock_validator
@@ -314,9 +306,7 @@ class TestValidationTools:
         """Test that tools log their execution."""
         mock_mcp = MagicMock()
 
-        with patch(
-            "textual_mcp.tools.validation_tools.log_tool_execution"
-        ) as mock_log_exec:
+        with patch("textual_mcp.tools.validation_tools.log_tool_execution") as mock_log_exec:
             with patch(
                 "textual_mcp.tools.validation_tools.log_tool_completion"
             ) as mock_log_complete:

@@ -103,9 +103,7 @@ class TestTextualDocsMemory:
         ]
 
         # Search with content type filter
-        results = await memory.search(
-            "widgets", limit=5, filters={"content_type": "guide"}
-        )
+        results = await memory.search("widgets", limit=5, filters={"content_type": "guide"})
 
         assert len(results) > 0
         assert all(r["metadata"]["content_type"] == "guide" for r in results)
@@ -145,9 +143,7 @@ class TestTextualDocumentProcessor:
         assert processor._determine_content_type("/docs/api/widgets.md") == "api"
         assert processor._determine_content_type("/docs/widgets/button.md") == "widget"
         assert processor._determine_content_type("/docs/examples/app.md") == "example"
-        assert (
-            processor._determine_content_type("/docs/css/styles.md") == "css_reference"
-        )
+        assert processor._determine_content_type("/docs/css/styles.md") == "css_reference"
         assert processor._determine_content_type("/docs/other.md") == "documentation"
 
     def test_split_text_with_overlap(self, processor):
@@ -221,9 +217,7 @@ The Button widget creates a clickable button.
             # Mock the tree response
             mock_tree_response = Mock()
             mock_tree_response.json.return_value = {
-                "tree": [
-                    {"path": "docs/guide/intro.md", "type": "blob", "sha": "abc123"}
-                ]
+                "tree": [{"path": "docs/guide/intro.md", "type": "blob", "sha": "abc123"}]
             }
             mock_tree_response.raise_for_status = Mock()
 
@@ -295,9 +289,7 @@ async def test_index_documentation():
 
     mock_processor.fetch_documentation = mock_fetch
     mock_processor.process_document = Mock(
-        return_value=[
-            {"text": "Test content", "metadata": {"doc_path": "docs/test.md"}}
-        ]
+        return_value=[{"text": "Test content", "metadata": {"doc_path": "docs/test.md"}}]
     )
 
     # Run indexing

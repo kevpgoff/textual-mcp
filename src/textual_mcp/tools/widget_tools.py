@@ -146,9 +146,7 @@ def register_widget_tools(mcp: Any, config: TextualMCPConfig) -> None:
 
                         # Get basic info about the widget
                         doc = inspect.getdoc(obj)
-                        first_line = (
-                            doc.split("\n")[0] if doc else "No description available"
-                        )
+                        first_line = doc.split("\n")[0] if doc else "No description available"
                         widget_info[name] = first_line
                 except (ImportError, AttributeError, ModuleNotFoundError) as e:
                     # Skip widgets that can't be imported
@@ -312,9 +310,7 @@ def register_widget_tools(mcp: Any, config: TextualMCPConfig) -> None:
                     suggestions.append("Widget name cannot be empty")
                 elif not widget_name.isidentifier():
                     # Clean up the name
-                    clean_name = "".join(
-                        c for c in widget_name if c.isalnum() or c == "_"
-                    )
+                    clean_name = "".join(c for c in widget_name if c.isalnum() or c == "_")
                     if clean_name and clean_name[0].isdigit():
                         clean_name = "Widget" + clean_name
                     if clean_name:

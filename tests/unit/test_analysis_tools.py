@@ -23,9 +23,7 @@ class TestAnalysisTools:
         assert mock_mcp.tool.call_count >= 1
 
     @pytest.mark.asyncio
-    async def test_detect_style_conflicts_tool_logic(
-        self, test_config: TextualMCPConfig
-    ):
+    async def test_detect_style_conflicts_tool_logic(self, test_config: TextualMCPConfig):
         """Test the detect_style_conflicts tool implementation logic."""
         mock_mcp = MagicMock()
         registered_tools = {}

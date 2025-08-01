@@ -228,9 +228,7 @@ class TestCacheKey:
 
     def test_cache_key_mixed_types(self):
         """Test cache key with mixed argument types."""
-        key = cache_key(
-            "string", 123, [1, 2, 3], {"key": "value"}, arg1="value1", arg2=456
-        )
+        key = cache_key("string", 123, [1, 2, 3], {"key": "value"}, arg1="value1", arg2=456)
 
         # Should produce a valid hash
         assert isinstance(key, str)

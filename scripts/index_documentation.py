@@ -41,9 +41,7 @@ async def main_async(args: argparse.Namespace) -> int:
             config.search.github_token = args.github_token
 
         # Create memory instance
-        persist_path = (
-            Path(config.search.persist_path) if config.search.persist_path else None
-        )
+        persist_path = Path(config.search.persist_path) if config.search.persist_path else None
         if persist_path and not persist_path.parent.exists():
             persist_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -84,13 +82,9 @@ async def main_async(args: argparse.Namespace) -> int:
             if rate_info["remaining"] < 300:
                 import time
 
-                reset_time = time.strftime(
-                    "%Y-%m-%d %H:%M:%S", time.localtime(rate_info["reset"])
-                )
+                reset_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(rate_info["reset"]))
                 print("⚠️  WARNING: Insufficient rate limit for indexing")
-                print(
-                    f"   Need ~300 requests, but only {rate_info['remaining']} remaining"
-                )
+                print(f"   Need ~300 requests, but only {rate_info['remaining']} remaining")
                 print(f"   Rate limit resets at: {reset_time}")
 
                 if not args.force:
@@ -162,19 +156,13 @@ Examples:
         help="Embeddings model to use (e.g., 'fast', 'TaylorAI/bge-micro-v2')",
     )
 
-    parser.add_argument(
-        "--persist-path", type=str, help="Path to persist the vector database"
-    )
+    parser.add_argument("--persist-path", type=str, help="Path to persist the vector database")
 
-    parser.add_argument(
-        "--chunk-size", type=int, help="Size of text chunks for indexing"
-    )
+    parser.add_argument("--chunk-size", type=int, help="Size of text chunks for indexing")
 
     parser.add_argument("--chunk-overlap", type=int, help="Overlap between text chunks")
 
-    parser.add_argument(
-        "--github-token", type=str, help="GitHub token for higher API rate limits"
-    )
+    parser.add_argument("--github-token", type=str, help="GitHub token for higher API rate limits")
 
     parser.add_argument(
         "--log-level",

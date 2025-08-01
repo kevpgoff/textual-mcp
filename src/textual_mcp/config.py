@@ -150,14 +150,10 @@ def _get_env_overrides() -> Dict[str, Any]:
 
     # Search configuration
     if os.getenv("EMBEDDINGS_MODEL"):
-        overrides.setdefault("search", {})["embeddings_model"] = os.getenv(
-            "EMBEDDINGS_MODEL"
-        )
+        overrides.setdefault("search", {})["embeddings_model"] = os.getenv("EMBEDDINGS_MODEL")
 
     if os.getenv("EMBEDDINGS_STORE"):
-        overrides.setdefault("search", {})["persist_path"] = os.getenv(
-            "EMBEDDINGS_STORE"
-        )
+        overrides.setdefault("search", {})["persist_path"] = os.getenv("EMBEDDINGS_STORE")
 
     # Logging configuration
     if os.getenv("LOG_LEVEL"):
@@ -169,9 +165,7 @@ def _get_env_overrides() -> Dict[str, Any]:
     # Performance configuration
     if os.getenv("CACHE_SIZE"):
         try:
-            overrides.setdefault("performance", {})["cache_size"] = int(
-                os.getenv("CACHE_SIZE", "")
-            )
+            overrides.setdefault("performance", {})["cache_size"] = int(os.getenv("CACHE_SIZE", ""))
         except ValueError:
             pass
 
@@ -189,11 +183,7 @@ def _get_env_overrides() -> Dict[str, Any]:
 def _deep_update(base_dict: Dict[str, Any], update_dict: Dict[str, Any]) -> None:
     """Deep update a dictionary with another dictionary."""
     for key, value in update_dict.items():
-        if (
-            key in base_dict
-            and isinstance(base_dict[key], dict)
-            and isinstance(value, dict)
-        ):
+        if key in base_dict and isinstance(base_dict[key], dict) and isinstance(value, dict):
             _deep_update(base_dict[key], value)
         else:
             base_dict[key] = value

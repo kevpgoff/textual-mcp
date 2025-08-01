@@ -104,9 +104,7 @@ class TestMCPIntegration:
 
         async with mcp_client as client:
             for selector in valid_selectors:
-                result = await client.call_tool(
-                    "check_selector", {"selector": selector}
-                )
+                result = await client.call_tool("check_selector", {"selector": selector})
 
                 assert result.data["valid"] is True
                 assert result.data["selector"] == selector
@@ -142,9 +140,7 @@ class TestMCPIntegration:
             # Check generated code content
             assert "class MyCustomWidget(Widget):" in result.data["python_code"]
             assert "MyCustomWidget {" in result.data["css_code"]
-            assert (
-                "from your_module import MyCustomWidget" in result.data["usage_example"]
-            )
+            assert "from your_module import MyCustomWidget" in result.data["usage_example"]
 
     @pytest.mark.asyncio
     async def test_generate_widget_invalid_name(self, mcp_client: Client):
@@ -210,9 +206,7 @@ class TestMCPIntegration:
         """Test validate_widget_name tool through MCP client."""
         async with mcp_client as client:
             # Valid name
-            result = await client.call_tool(
-                "validate_widget_name", {"widget_name": "MyWidget"}
-            )
+            result = await client.call_tool("validate_widget_name", {"widget_name": "MyWidget"})
 
             assert result.data["valid"] is True
             assert result.data["widget_name"] == "MyWidget"

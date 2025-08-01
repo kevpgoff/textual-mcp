@@ -46,12 +46,8 @@ include = ["src/textual_mcp"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/textual_mcp"]
 
-[tool.black]
-line-length = 88
-target-version = ['py312']
-
 [tool.ruff]
-line-length = 88
+line-length = 100
 target-version = "py312"
 
 [tool.mypy]

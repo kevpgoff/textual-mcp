@@ -95,9 +95,7 @@ class SelectorValidator(LoggerMixin):
                 specificity=(0, 0, 0),
             )
 
-    def validate_selectors(
-        self, selectors: List[str]
-    ) -> List[SelectorValidationResult]:
+    def validate_selectors(self, selectors: List[str]) -> List[SelectorValidationResult]:
         """Validate multiple selectors."""
         return [self.validate_selector(selector) for selector in selectors]
 
@@ -154,9 +152,7 @@ class SelectorValidator(LoggerMixin):
             type_words = [
                 word
                 for word in words
-                if not word.startswith(
-                    ("hover", "focus", "active", "visited", "before", "after")
-                )
+                if not word.startswith(("hover", "focus", "active", "visited", "before", "after"))
                 and not word.isdigit()
                 and len(word) > 0
             ]
@@ -170,9 +166,7 @@ class SelectorValidator(LoggerMixin):
             return (id_count, max(0, class_count), max(0, type_count))
 
         except Exception as e:
-            self.logger.warning(
-                f"Failed to calculate specificity for '{selector}': {e}"
-            )
+            self.logger.warning(f"Failed to calculate specificity for '{selector}': {e}")
             return (0, 0, 0)
 
     def analyze_selector_complexity(self, selector: str) -> Dict[str, Any]:
@@ -194,16 +188,12 @@ class SelectorValidator(LoggerMixin):
             if result.specificity[0] > 1:  # Multiple IDs
                 recommendations = analysis.get("recommendations", [])
                 if isinstance(recommendations, list):
-                    recommendations.append(
-                        "Avoid using multiple IDs in a single selector"
-                    )
+                    recommendations.append("Avoid using multiple IDs in a single selector")
 
             if specificity_score > 10:
                 recommendations = analysis.get("recommendations", [])
                 if isinstance(recommendations, list):
-                    recommendations.append(
-                        "Selector is very specific, consider simplifying"
-                    )
+                    recommendations.append("Selector is very specific, consider simplifying")
             elif specificity_score > 5:
                 recommendations = analysis.get("recommendations", [])
                 if isinstance(recommendations, list):
@@ -224,8 +214,6 @@ class SelectorValidator(LoggerMixin):
             if "*" in selector:
                 recommendations = analysis.get("recommendations", [])
                 if isinstance(recommendations, list):
-                    recommendations.append(
-                        "Universal selector (*) can impact performance"
-                    )
+                    recommendations.append("Universal selector (*) can impact performance")
 
         return analysis

@@ -31,9 +31,7 @@ class TestTextualMCPServer:
         assert server.mcp is not None
 
     @patch("textual_mcp.server.register_validation_tools")
-    def test_tool_registration_failure(
-        self, mock_register, test_config: TextualMCPConfig
-    ):
+    def test_tool_registration_failure(self, mock_register, test_config: TextualMCPConfig):
         """Test server behavior when tool registration fails."""
         mock_register.side_effect = Exception("Registration failed")
 
@@ -112,9 +110,7 @@ class TestCreateServer:
 
     def test_create_server_failure(self):
         """Test create_server behavior on failure."""
-        with patch(
-            "textual_mcp.server.load_config", side_effect=Exception("Config error")
-        ):
+        with patch("textual_mcp.server.load_config", side_effect=Exception("Config error")):
             with patch("sys.exit") as mock_exit:
                 with patch("builtins.print") as mock_print:
                     create_server()

@@ -18,9 +18,7 @@ def register_layout_tools(mcp: Any, config: TextualMCPConfig) -> None:
     async def generate_grid_layout(
         rows: Annotated[
             int,
-            Field(
-                description="Number of grid rows to create in the layout.", ge=1, le=20
-            ),
+            Field(description="Number of grid rows to create in the layout.", ge=1, le=20),
         ],
         columns: Annotated[
             int,
@@ -135,9 +133,7 @@ class GridApp(App):
         """Generate grid item widgets for the example."""
         items = []
         for i in range(count):
-            items.append(
-                f'            yield Static(f"Item {i + 1}", classes="grid-item")'
-            )
+            items.append(f'            yield Static(f"Item {i + 1}", classes="grid-item")')
         return "\n".join(items)
 
     logger.info("Registered layout tools: generate_grid_layout")

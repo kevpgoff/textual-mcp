@@ -180,9 +180,7 @@ class TestInlineValidator:
 
     def test_validate_multiple_properties(self):
         """Test multiple properties in one declaration."""
-        result = self.validator.validate(
-            "color: red; background: blue; padding: 1 2; margin: 0;"
-        )
+        result = self.validator.validate("color: red; background: blue; padding: 1 2; margin: 0;")
 
         assert result.valid is True
         assert len(result.errors) == 0
@@ -239,9 +237,7 @@ class TestInlineValidator:
     def test_error_recovery(self):
         """Test error recovery in parsing."""
         # Invalid syntax that should produce errors
-        result = self.validator.validate(
-            "color: red; invalid syntax here; background: blue;"
-        )
+        result = self.validator.validate("color: red; invalid syntax here; background: blue;")
 
         # Should have errors but might still parse some valid parts
         assert len(result.errors) > 0 or len(result.warnings) > 0

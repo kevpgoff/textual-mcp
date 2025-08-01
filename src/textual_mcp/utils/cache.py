@@ -168,9 +168,7 @@ class CacheManager:
     def __init__(self) -> None:
         self._caches: Dict[str, LRUCache] = {}
 
-    def create_cache(
-        self, name: str, max_size: int = 128, ttl: Optional[float] = None
-    ) -> LRUCache:
+    def create_cache(self, name: str, max_size: int = 128, ttl: Optional[float] = None) -> LRUCache:
         """Create a new named cache."""
         cache: LRUCache[Any, Any] = LRUCache(max_size=max_size, ttl=ttl)
         self._caches[name] = cache

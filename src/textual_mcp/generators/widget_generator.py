@@ -72,9 +72,7 @@ class WidgetGenerator(LoggerMixin):
             event_handlers = event_handlers or []
 
             # Generate Python code
-            python_code = self._generate_python_code(
-                widget_name, widget_type_enum, event_handlers
-            )
+            python_code = self._generate_python_code(widget_name, widget_type_enum, event_handlers)
 
             # Generate CSS code if requested
             css_code = ""
@@ -158,9 +156,7 @@ class WidgetGenerator(LoggerMixin):
             event_methods=event_methods,
             compose_method=compose_method,
             render_method=render_method,
-            additional_imports=self._get_additional_imports(
-                widget_type, event_handlers
-            ),
+            additional_imports=self._get_additional_imports(widget_type, event_handlers),
         )
 
         return python_code
@@ -235,9 +231,7 @@ await self.mount(widget)"""
             yield Label("Right panel")''',
         }
 
-        return compose_templates.get(
-            widget_type, compose_templates[WidgetType.CONTAINER]
-        )
+        return compose_templates.get(widget_type, compose_templates[WidgetType.CONTAINER])
 
     def _generate_render_method(self, widget_type: WidgetType, widget_name: str) -> str:
         """Generate render method if needed."""
@@ -248,9 +242,7 @@ await self.mount(widget)"""
         self.query_one("#display-content", Static).update(content)'''
         return ""
 
-    def _get_additional_imports(
-        self, widget_type: WidgetType, event_handlers: List[str]
-    ) -> str:
+    def _get_additional_imports(self, widget_type: WidgetType, event_handlers: List[str]) -> str:
         """Get additional imports based on widget type and event handlers."""
         imports = set()
 

@@ -197,12 +197,8 @@ class TestWidgetTools:
             mock_tw.Input = MockInput
 
             # Mock inspect functions
-            with patch(
-                "textual_mcp.tools.widget_tools.inspect.isclass", return_value=True
-            ):
-                with patch(
-                    "textual_mcp.tools.widget_tools.inspect.getdoc"
-                ) as mock_getdoc:
+            with patch("textual_mcp.tools.widget_tools.inspect.isclass", return_value=True):
+                with patch("textual_mcp.tools.widget_tools.inspect.getdoc") as mock_getdoc:
                     mock_getdoc.side_effect = lambda obj: obj.__doc__
 
                     result = await list_widget_types()
@@ -288,10 +284,7 @@ class TestWidgetTools:
         assert result["valid"] is False
         assert result["error"] is not None
         assert len(result["suggestions"]) > 0
-        assert (
-            "Mywidget" in result["suggestions"][0]
-            or "MyWidget" in result["suggestions"][0]
-        )
+        assert "Mywidget" in result["suggestions"][0] or "MyWidget" in result["suggestions"][0]
 
         # Test empty widget name
         result = await validate_widget_name(widget_name="")
@@ -318,9 +311,7 @@ class TestWidgetTools:
         assert "Widget123Widget" in result["suggestions"][0]
 
     @pytest.mark.asyncio
-    async def test_tool_error_handling_list_widgets(
-        self, test_config: TextualMCPConfig
-    ):
+    async def test_tool_error_handling_list_widgets(self, test_config: TextualMCPConfig):
         """Test error handling in list_widget_types tool."""
         mock_mcp = MagicMock()
         registered_tools = {}
@@ -368,12 +359,8 @@ class TestWidgetTools:
 
         mock_mcp.tool = tool_decorator
 
-        with patch(
-            "textual_mcp.tools.widget_tools.log_tool_execution"
-        ) as mock_log_exec:
-            with patch(
-                "textual_mcp.tools.widget_tools.log_tool_completion"
-            ) as mock_log_complete:
+        with patch("textual_mcp.tools.widget_tools.log_tool_execution") as mock_log_exec:
+            with patch("textual_mcp.tools.widget_tools.log_tool_completion") as mock_log_complete:
                 register_widget_tools(mock_mcp, test_config)
 
                 # Execute a tool

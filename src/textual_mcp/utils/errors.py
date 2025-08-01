@@ -46,9 +46,7 @@ class VectorStoreError(TextualMCPError):
 class ToolExecutionError(TextualMCPError):
     """Exception raised when MCP tool execution fails."""
 
-    def __init__(
-        self, tool_name: str, message: str, details: Optional[Dict[str, Any]] = None
-    ):
+    def __init__(self, tool_name: str, message: str, details: Optional[Dict[str, Any]] = None):
         super().__init__(message, details)
         self.tool_name = tool_name
 

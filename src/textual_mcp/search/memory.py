@@ -30,8 +30,7 @@ class TextualDocsMemory:
             from vectordb import Memory
         except ImportError as e:
             raise ImportError(
-                "VectorDB is required for documentation search. "
-                "Install it with: uv add vectordb2"
+                "VectorDB is required for documentation search. Install it with: uv add vectordb2"
             ) from e
 
         self.logger = get_logger("textual_docs_memory")
@@ -47,9 +46,7 @@ class TextualDocsMemory:
                 f"Initialized VectorDB with embeddings: {embeddings}, persisting to: {memory_file}"
             )
         else:
-            self.logger.info(
-                f"Initialized VectorDB with embeddings: {embeddings} (in-memory only)"
-            )
+            self.logger.info(f"Initialized VectorDB with embeddings: {embeddings} (in-memory only)")
 
     def is_indexed(self) -> bool:
         """
@@ -62,18 +59,14 @@ class TextualDocsMemory:
             # Check if memory has any entries
             has_docs = len(self.memory.memory) > 0
             if has_docs and self.persist_path:
-                self.logger.debug(
-                    f"Found {len(self.memory.memory)} documents in persisted index"
-                )
+                self.logger.debug(f"Found {len(self.memory.memory)} documents in persisted index")
             return has_docs
         except Exception as e:
             self.logger.debug(f"Database not indexed: {e}")
             # If there's an exception, assume the database is not indexed
             return False
 
-    async def index_documents(
-        self, documents: List[Dict[str, Any]], batch_size: int = 100
-    ) -> None:
+    async def index_documents(self, documents: List[Dict[str, Any]], batch_size: int = 100) -> None:
         """
         Index documents into VectorDB.
 
@@ -81,9 +74,7 @@ class TextualDocsMemory:
             documents: List of document chunks with metadata
             batch_size: Number of documents to process at once
         """
-        self.logger.info(
-            f"Indexing {len(documents)} documents in batches of {batch_size}"
-        )
+        self.logger.info(f"Indexing {len(documents)} documents in batches of {batch_size}")
 
         texts = []
         metadata = []

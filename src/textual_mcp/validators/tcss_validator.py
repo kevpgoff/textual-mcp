@@ -53,9 +53,7 @@ class TCSSValidator(LoggerMixin):
         self.config = config
         self.strict_mode = config.strict_mode
 
-    def validate(
-        self, css_content: str, filename: Optional[str] = None
-    ) -> ValidationResult:
+    def validate(self, css_content: str, filename: Optional[str] = None) -> ValidationResult:
         """
         Validate TCSS content using Textual's native parser.
 
@@ -81,9 +79,7 @@ class TCSSValidator(LoggerMixin):
                         f"CSS content exceeds maximum size limit of {self.config.max_file_size} bytes"
                     )
                 )
-                return self._create_result(
-                    False, errors, warnings, suggestions, 0, 0, 0
-                )
+                return self._create_result(False, errors, warnings, suggestions, 0, 0, 0)
 
             # Parse CSS using Textual's native parser
             try:
@@ -232,9 +228,7 @@ class TCSSValidator(LoggerMixin):
                                 )
                             )
                         elif sum(specificity) > 10:  # Overall too specific
-                            suggestions.append(
-                                f"Consider simplifying selector: {selector}"
-                            )
+                            suggestions.append(f"Consider simplifying selector: {selector}")
 
             # Check for empty rules
             for rule in stylesheet:
@@ -263,18 +257,12 @@ class TCSSValidator(LoggerMixin):
             if ":" in line and not line.endswith((";", "{", "}")):
                 if not line.endswith("*/"):  # Not a comment
                     warnings.append(
-                        ValidationError(
-                            "Missing semicolon at end of declaration", line=i
-                        )
+                        ValidationError("Missing semicolon at end of declaration", line=i)
                     )
 
             # Check for color values that could be variables
-            if any(
-                color in line.lower() for color in ["#ffffff", "#000000", "#ff0000"]
-            ):
-                suggestions.append(
-                    f"Line {i}: Consider using CSS variables for common colors"
-                )
+            if any(color in line.lower() for color in ["#ffffff", "#000000", "#ff0000"]):
+                suggestions.append(f"Line {i}: Consider using CSS variables for common colors")
 
     def _calculate_specificity(self, selector: Any) -> Tuple[int, int, int]:
         """Calculate CSS selector specificity (id, class, type)."""
@@ -285,9 +273,7 @@ class TCSSValidator(LoggerMixin):
 
             id_count = selector_str.count("#")
             class_count = (
-                selector_str.count(".")
-                + selector_str.count("[")
-                + selector_str.count(":")
+                selector_str.count(".") + selector_str.count("[") + selector_str.count(":")
             )
             type_count = len(
                 [
@@ -318,9 +304,7 @@ class TCSSValidator(LoggerMixin):
             property_name=getattr(error, "property", None),
         )
 
-    def _convert_variable_error(
-        self, error: UnresolvedVariableError
-    ) -> ValidationError:
+    def _convert_variable_error(self, error: UnresolvedVariableError) -> ValidationError:
         """Convert Textual UnresolvedVariableError to ValidationError."""
         return ValidationError(
             message=f"Unresolved CSS variable: {error}",

@@ -45,9 +45,7 @@ class TestTCSSValidator:
         assert result.valid is True
         assert result.rule_count >= 1
 
-    def test_validate_file_exists(
-        self, tcss_validator: TCSSValidator, sample_css_file: Path
-    ):
+    def test_validate_file_exists(self, tcss_validator: TCSSValidator, sample_css_file: Path):
         """Test validation of existing file."""
         result = tcss_validator.validate_file(str(sample_css_file))
 
@@ -72,9 +70,7 @@ class TestTCSSValidator:
         if len(large_css) > tcss_validator.config.max_file_size:
             result = tcss_validator.validate(large_css)
             assert result.valid is False
-            assert any(
-                "exceeds maximum size" in error.message for error in result.errors
-            )
+            assert any("exceeds maximum size" in error.message for error in result.errors)
 
     def test_strict_mode_toggle(self, tcss_validator: TCSSValidator, sample_css: str):
         """Test strict mode functionality."""
@@ -119,9 +115,7 @@ class TestTCSSValidator:
         # We mainly test that it doesn't crash
         assert isinstance(result, ValidationResult)
 
-    def test_validation_result_structure(
-        self, tcss_validator: TCSSValidator, sample_css: str
-    ):
+    def test_validation_result_structure(self, tcss_validator: TCSSValidator, sample_css: str):
         """Test that validation result has correct structure."""
         result = tcss_validator.validate(sample_css)
 

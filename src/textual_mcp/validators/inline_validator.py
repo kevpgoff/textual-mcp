@@ -57,9 +57,7 @@ class InlineValidator(LoggerMixin):
         except Exception as e:
             errors.append(ValidationError(f"Failed to parse inline styles: {str(e)}"))
 
-        return InlineValidationResult(
-            valid=len(errors) == 0, errors=errors, warnings=warnings
-        )
+        return InlineValidationResult(valid=len(errors) == 0, errors=errors, warnings=warnings)
 
     def _validate_declarations(
         self, declarations: Any, original_string: str, warnings: List[ValidationError]
@@ -70,15 +68,11 @@ class InlineValidator(LoggerMixin):
             seen_properties = set()
             for declaration in declarations:
                 prop_name = (
-                    str(declaration.name)
-                    if hasattr(declaration, "name")
-                    else str(declaration)
+                    str(declaration.name) if hasattr(declaration, "name") else str(declaration)
                 )
                 if prop_name in seen_properties:
                     warnings.append(
-                        ValidationError(
-                            f"Duplicate property: {prop_name}", property_name=prop_name
-                        )
+                        ValidationError(f"Duplicate property: {prop_name}", property_name=prop_name)
                     )
                 seen_properties.add(prop_name)
 
@@ -86,9 +80,7 @@ class InlineValidator(LoggerMixin):
             if original_string.strip() and not original_string.strip().endswith(";"):
                 # Only warn if there are multiple declarations
                 if ";" in original_string:
-                    warnings.append(
-                        ValidationError("Missing semicolon at end of declarations")
-                    )
+                    warnings.append(ValidationError("Missing semicolon at end of declarations"))
 
         except Exception as e:
             self.logger.warning(f"Additional inline validation failed: {e}")

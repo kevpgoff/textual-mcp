@@ -91,9 +91,7 @@ class TestWidgetGenerator:
         assert "class MyContainer(Widget):" in result.python_code
         assert "from textual.widgets import Label, Button" in result.python_code
         assert "def compose(self)" in result.python_code
-        assert (
-            "def on_button_pressed(self, event: Button.Pressed)" in result.python_code
-        )
+        assert "def on_button_pressed(self, event: Button.Pressed)" in result.python_code
 
         # Check CSS code
         assert "MyContainer {" in result.css_code
@@ -162,9 +160,7 @@ class TestWidgetGenerator:
         assert "from textual.widgets import Button, Label" in result.python_code
         assert "yield Button(" in result.python_code
         assert "yield Label(" in result.python_code
-        assert (
-            "def on_button_pressed(self, event: Button.Pressed)" in result.python_code
-        )
+        assert "def on_button_pressed(self, event: Button.Pressed)" in result.python_code
         assert "def on_key(self, event: Key)" in result.python_code
 
     def test_generate_layout_widget(self):
@@ -211,20 +207,14 @@ class TestWidgetGenerator:
     def test_generate_widget_invalid_name(self):
         """Test generating a widget with invalid name."""
         with pytest.raises(ValidationError) as exc_info:
-            self.generator.generate_widget(
-                widget_name="invalid_name", widget_type="container"
-            )
+            self.generator.generate_widget(widget_name="invalid_name", widget_type="container")
 
-        assert "Widget name should start with an uppercase letter" in str(
-            exc_info.value
-        )
+        assert "Widget name should start with an uppercase letter" in str(exc_info.value)
 
     def test_generate_widget_invalid_type(self):
         """Test generating a widget with invalid type."""
         with pytest.raises(ValidationError) as exc_info:
-            self.generator.generate_widget(
-                widget_name="ValidName", widget_type="invalid_type"
-            )
+            self.generator.generate_widget(widget_name="ValidName", widget_type="invalid_type")
 
         assert "Invalid widget type" in str(exc_info.value)
 
@@ -237,9 +227,7 @@ class TestWidgetGenerator:
 
     def test_generate_widget_timing(self):
         """Test that widget generation includes timing information."""
-        result = self.generator.generate_widget(
-            widget_name="TimedWidget", widget_type="container"
-        )
+        result = self.generator.generate_widget(widget_name="TimedWidget", widget_type="container")
 
         assert result.generation_time_ms > 0
         assert isinstance(result.generation_time_ms, float)
@@ -280,29 +268,21 @@ class TestWidgetGenerator:
         """Test generating render method."""
         # Modern Textual widgets use compose, not render
         # For display widgets, it generates an update_content method instead
-        render_method = self.generator._generate_render_method(
-            WidgetType.DISPLAY, "TestWidget"
-        )
+        render_method = self.generator._generate_render_method(WidgetType.DISPLAY, "TestWidget")
         assert "update_content" in render_method
         assert "self.query_one" in render_method
 
         # Other widgets should not have render method
-        render_method = self.generator._generate_render_method(
-            WidgetType.CONTAINER, "TestWidget"
-        )
+        render_method = self.generator._generate_render_method(WidgetType.CONTAINER, "TestWidget")
         assert render_method == ""
 
     def test_get_additional_imports(self):
         """Test getting additional imports."""
-        imports = self.generator._get_additional_imports(
-            WidgetType.CONTAINER, ["click"]
-        )
+        imports = self.generator._get_additional_imports(WidgetType.CONTAINER, ["click"])
         assert "from textual.app import ComposeResult" in imports
         assert "from textual.widgets import Label, Button" in imports
 
-        imports = self.generator._get_additional_imports(
-            WidgetType.INPUT, ["input_changed"]
-        )
+        imports = self.generator._get_additional_imports(WidgetType.INPUT, ["input_changed"])
         assert "from textual.widgets import Input" in imports
 
     @patch("textual_mcp.generators.widget_generator.time.time")
@@ -311,9 +291,7 @@ class TestWidgetGenerator:
         mock_time.side_effect = [0, 0.1]  # start_time, end_time
 
         # Mock the _validate_inputs method to raise an exception
-        with patch.object(
-            self.generator, "_validate_inputs", side_effect=Exception("Test error")
-        ):
+        with patch.object(self.generator, "_validate_inputs", side_effect=Exception("Test error")):
             with pytest.raises(ToolExecutionError) as exc_info:
                 self.generator.generate_widget("TestWidget", "container")
 

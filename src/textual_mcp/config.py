@@ -34,6 +34,38 @@ class IndexingConfig(BaseModel):
     )
 
 
+class ChonkieContentTypeConfig(BaseModel):
+    """Configuration for content-type specific Chonkie settings."""
+
+    chunker: str = "semantic"
+    chunk_size: int = 512
+    min_chunk_size: Optional[int] = None
+    language: Optional[str] = None
+    recipe: Optional[str] = None
+    min_sentences: Optional[int] = None
+
+
+class ChonkieConfig(BaseModel):
+    """Configuration for Chonkie chunking strategy."""
+
+    default_chunker: str = "semantic"  # "token" | "sentence" | "semantic" | "recursive"
+    embedding_model: str = "all-mpnet-base-v2"
+    content_types: Dict[str, ChonkieContentTypeConfig] = Field(
+        default_factory=lambda: {
+            "code": ChonkieContentTypeConfig(
+                chunker="experimental_code", chunk_size=512, language="python"
+            ),
+            "api": ChonkieContentTypeConfig(chunker="semantic", chunk_size=768, min_chunk_size=256),
+            "guide": ChonkieContentTypeConfig(
+                chunker="recursive", recipe="markdown", chunk_size=512
+            ),
+            "css_reference": ChonkieContentTypeConfig(
+                chunker="semantic", chunk_size=384, min_sentences=2
+            ),
+        }
+    )
+
+
 class SearchConfig(BaseModel):
     """Configuration for documentation search functionality."""
 
@@ -45,6 +77,10 @@ class SearchConfig(BaseModel):
     github_token: Optional[str] = None
     default_limit: int = 10
     similarity_threshold: float = 0.7
+
+    # Chunking strategy
+    chunking_strategy: str = "chonkie"  # "manual" | "chonkie"
+    chonkie: ChonkieConfig = Field(default_factory=ChonkieConfig)
 
 
 class PerformanceConfig(BaseModel):

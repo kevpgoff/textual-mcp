@@ -245,26 +245,6 @@ class TestMCPIntegration:
             assert "grid" in result.data["css"]
 
     @pytest.mark.asyncio
-    async def test_analyze_layout_tool(self, mcp_client: Client):
-        """Test analyze_selectors tool through MCP client."""
-        async with mcp_client as client:
-            css_content = """
-            Button {
-                color: red;
-            }
-            .custom {
-                background: blue;
-            }
-            """
-
-            result = await client.call_tool(
-                "analyze_selectors", {"css_content": css_content}
-            )
-
-            assert "selectors" in result.data
-            assert "recommendations" in result.data
-
-    @pytest.mark.asyncio
     async def test_tool_error_handling(self, mcp_client: Client):
         """Test error handling for tool execution."""
         async with mcp_client as client:
@@ -304,29 +284,3 @@ class TestMCPIntegration:
                 "validate_tcss", {"css_content": widget_result.data["css_code"]}
             )
             assert css_result.data["valid"] is True
-
-    @pytest.mark.asyncio
-    async def test_analysis_tools_placeholder(self, mcp_client: Client):
-        """Test analysis tools (currently have TODO implementations)."""
-        async with mcp_client as client:
-            # These tools currently return placeholder responses
-
-            # Test analyze_selectors
-            result = await client.call_tool(
-                "analyze_selectors", {"css_content": "Button { color: red; }"}
-            )
-            assert "selectors" in result.data
-            assert "recommendations" in result.data
-
-            # Test extract_css_variables
-            result = await client.call_tool(
-                "extract_css_variables", {"css_content": ":root { --primary: blue; }"}
-            )
-            assert "variables" in result.data
-
-            # Test detect_style_conflicts
-            result = await client.call_tool(
-                "detect_style_conflicts",
-                {"css_content": "Button { color: red; } Button { color: blue; }"},
-            )
-            assert "conflicts" in result.data

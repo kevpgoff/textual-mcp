@@ -9,7 +9,7 @@ from mistletoe.block_token import (  # type: ignore[import-untyped]
     List as ListToken,
 )
 import httpx
-from typing import List, Dict, Any, AsyncIterator, Optional
+from typing import List, Dict, Any, AsyncIterator, Optional, Union
 from datetime import datetime
 import base64
 
@@ -354,7 +354,7 @@ async def index_documentation(
 
     duration = (datetime.now() - start_time).total_seconds()
 
-    result = {
+    result: Dict[str, Union[str, int, float]] = {
         "documents_processed": total_docs,
         "chunks_created": total_chunks,
         "indexing_duration": duration,

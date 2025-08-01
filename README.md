@@ -8,7 +8,7 @@ The Textual MCP Server enables AI assistants to help you develop Textual applica
 
 - **CSS Validation**: Validate TCSS (Textual CSS) using Textual's native parser
 - **Code Generation**: Generate boilerplate for widgets, layouts, and screens
-- **Style Analysis**: Analyze CSS selectors, detect conflicts, and extract variables
+- **Style Analysis**: Analyze CSS selectors, detect conflicts, and validate classes.
 - **Documentation Search**: Semantic search through Textual docs and examples
 - **Widget Information**: Get detailed information about Textual widgets and their properties
 
@@ -194,7 +194,6 @@ uv sync --upgrade
 The following analysis tools are planned but not yet implemented:
 
 - **`analyze_selectors`** - Analyze CSS selector usage and specificity (stub)
-- **`extract_css_variables`** - Find and list all CSS variables (stub)
 - **`detect_style_conflicts`** - Identify potential CSS conflicts (stub)
 
 ### Documentation Tools
@@ -257,13 +256,6 @@ The Textual MCP Server includes semantic search capabilities for Textual documen
      github_token: null  # Optional: for private repos
      default_limit: 10  # Default number of results
      similarity_threshold: 0.7  # Minimum similarity score
-   ```
-
-3. **Environment Variables** (optional):
-   ```bash
-   export TEXTUAL_MCP_SEARCH_AUTO_INDEX=true
-   export TEXTUAL_MCP_SEARCH_EMBEDDINGS_MODEL="BAAI/bge-base-en-v1.5"
-   export TEXTUAL_MCP_SEARCH_GITHUB_TOKEN="your-token"  # For private repos
    ```
 
 ### Using Vector Search

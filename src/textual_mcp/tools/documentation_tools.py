@@ -2,7 +2,7 @@
 
 import time
 import os
-from typing import Dict, Any, List, Optional, Annotated
+from typing import Dict, Any, List, Optional, Annotated, Union
 from pathlib import Path
 import asyncio
 import httpx
@@ -268,7 +268,7 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
             memory = get_docs_memory(config)
 
             if not force_reindex and memory.is_indexed():
-                response = {
+                response: Dict[str, Union[str, Dict[str, Union[str, int, float]]]] = {
                     "status": "already_indexed",
                     "message": "Documentation is already indexed. Use force_reindex=True to update.",
                 }
@@ -316,7 +316,7 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
 
                 response = {
                     "status": "success",
-                    "stats": stats,  # type: ignore[dict-item]
+                    "stats": stats,
                 }
 
             duration = time.time() - start_time

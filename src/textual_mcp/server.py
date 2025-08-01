@@ -26,19 +26,16 @@ class TextualMCPServer:
         self.config = config
         self.logger = get_logger("server")
 
-        # Initialize FastMCP server
         self.mcp: Any = FastMCP(
-            name="Textual Development Assistant",
-            version="1.0.0",
+            name="TextualMCP",
+            version="0.1.0",
         )
 
-        # Register all tools
         self._register_tools()
 
         # Initialize documentation search if enabled
         if config.search.auto_index:
             try:
-                # This will trigger auto-indexing if needed
                 memory = get_docs_memory(config)
                 if not memory.is_indexed():
                     self.logger.info("Documentation search will be indexed on first use")
@@ -52,23 +49,18 @@ class TextualMCPServer:
     def _register_tools(self) -> None:
         """Register all MCP tools."""
         try:
-            # Register validation tools
             register_validation_tools(self.mcp, self.config)
             self.logger.info("Registered validation tools")
 
-            # Register analysis tools
             register_analysis_tools(self.mcp, self.config)
             self.logger.info("Registered analysis tools")
 
-            # Register widget tools
             register_widget_tools(self.mcp, self.config)
             self.logger.info("Registered widget tools")
 
-            # Register layout tools
             register_layout_tools(self.mcp, self.config)
             self.logger.info("Registered layout tools")
 
-            # Register documentation tools
             register_documentation_tools(self.mcp, self.config)
             self.logger.info("Registered documentation tools")
 
@@ -80,7 +72,7 @@ class TextualMCPServer:
         """Start the MCP server."""
         try:
             self.logger.info("Starting Textual MCP Server...")
-            await self.mcp.run()  # type: ignore[func-returns-value]
+            await self.mcp.run()
         except Exception as e:
             self.logger.error(f"Server failed to start: {e}")
             raise
@@ -107,13 +99,10 @@ def create_server(config_path: Optional[str] = None) -> TextualMCPServer:
         Configured TextualMCPServer instance
     """
     try:
-        # Load configuration
         config = load_config(config_path)
 
-        # Setup logging
         setup_logging(config.logging)
 
-        # Create server
         server = TextualMCPServer(config)
 
         return server
@@ -135,17 +124,15 @@ def main() -> None:
         default="INFO",
         help="Log level",
     )
-    parser.add_argument("--version", action="version", version="Textual MCP Server 1.0.0")
+    parser.add_argument("--version", action="version", version="0.1.0")
 
     args = parser.parse_args()
 
-    # Override log level if specified
     if args.log_level:
         import os
 
         os.environ["LOG_LEVEL"] = args.log_level
 
-    # Create and run server
     server = create_server(args.config)
     server.run()
 
@@ -155,8 +142,7 @@ if __name__ == "__main__":
 
 
 # Create a default server instance for FastMCP to discover
-# This is what FastMCP CLI looks for when using `fastmcp dev`
 _default_config = load_config()
 setup_logging(_default_config.logging)
 _server_instance = TextualMCPServer(_default_config)
-server = _server_instance.mcp  # FastMCP expects a 'server' variable
+server = _server_instance.mcp

@@ -2,13 +2,17 @@
 
 import time
 import threading
-from typing import Any, Dict, Optional, Tuple, Generic, TypeVar, Callable
+from typing import Any, Dict, Optional, Tuple, Generic, TypeVar, Callable, cast
+from typing_extensions import ParamSpec
 from collections import OrderedDict
 from functools import wraps
 from hashlib import md5
 
 K = TypeVar("K")
 V = TypeVar("V")
+P = ParamSpec("P")
+R = TypeVar("R")
+F = TypeVar("F", bound=Callable[..., Any])
 
 
 class LRUCache(Generic[K, V]):
@@ -120,7 +124,47 @@ def cache_key(*args: Any, **kwargs: Any) -> str:
     return md5(key_string.encode()).hexdigest()
 
 
-def cached(cache: LRUCache, key_func: Optional[Callable[..., str]] = None) -> Callable:
+class CachedFunctionWrapper(Generic[P, R]):
+    """Wrapper for cached functions with cache management methods."""
+
+    def __init__(
+        self,
+        func: Callable[P, R],
+        cache: LRUCache[str, Any],
+        key_func: Optional[Callable[..., str]] = None,
+    ):
+        self._func = func
+        self.cache: LRUCache[str, Any] = cache
+        self._key_func = key_func
+        self.cache_clear = cache.clear
+        self.cache_info = lambda: {
+            "size": cache.size(),
+            "max_size": cache.max_size,
+            "ttl": cache.ttl,
+        }
+        wraps(func)(self)
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        # Generate cache key
+        if self._key_func:
+            key = self._key_func(*args, **kwargs)
+        else:
+            key = cache_key(*args, **kwargs)
+
+        # Try to get from cache
+        cached_result = self.cache.get(key)
+        if cached_result is not None:
+            return cast(R, cached_result)
+
+        # Execute function and cache result
+        result = self._func(*args, **kwargs)
+        self.cache.put(key, result)
+        return result
+
+
+def cached(
+    cache: LRUCache[str, Any], key_func: Optional[Callable[..., str]] = None
+) -> Callable[[Callable[P, R]], CachedFunctionWrapper[P, R]]:
     """
     Decorator to cache function results.
 
@@ -129,35 +173,8 @@ def cached(cache: LRUCache, key_func: Optional[Callable[..., str]] = None) -> Ca
         key_func: Function to generate cache key (default: use cache_key)
     """
 
-    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
-        @wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            # Generate cache key
-            if key_func:
-                key = key_func(*args, **kwargs)
-            else:
-                key = cache_key(*args, **kwargs)
-
-            # Try to get from cache
-            result = cache.get(key)
-            if result is not None:
-                return result
-
-            # Execute function and cache result
-            result = func(*args, **kwargs)
-            cache.put(key, result)
-            return result
-
-        # Add cache management methods to the wrapper
-        wrapper.cache = cache  # type: ignore[attr-defined]
-        wrapper.cache_clear = cache.clear  # type: ignore[attr-defined]
-        wrapper.cache_info = lambda: {  # type: ignore[attr-defined]
-            "size": cache.size(),
-            "max_size": cache.max_size,
-            "ttl": cache.ttl,
-        }
-
-        return wrapper
+    def decorator(func: Callable[P, R]) -> CachedFunctionWrapper[P, R]:
+        return CachedFunctionWrapper(func, cache, key_func)
 
     return decorator
 

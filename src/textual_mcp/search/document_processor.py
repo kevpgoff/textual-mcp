@@ -1,7 +1,7 @@
 """Process Textual documentation for indexing."""
 
-from mistletoe import Document  # type: ignore[import-untyped]
-from mistletoe.block_token import (  # type: ignore[import-untyped]
+from mistletoe import Document
+from mistletoe.block_token import (
     Heading,
     Paragraph,
     CodeFence,

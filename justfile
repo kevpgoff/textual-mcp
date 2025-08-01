@@ -83,6 +83,17 @@ pre-commit-update:
 pre-commit-check:
     uv run pre-commit run --all-files --show-diff-on-failure
 
+# Generate type stubs for untyped dependencies
+generate-stubs:
+    @echo "Generating type stubs for untyped dependencies..."
+    mkdir -p stubs
+    {{python}} -m mypy.stubgen -p vectordb -o stubs/ 2>/dev/null || true
+    @echo "Type stubs generated in stubs/"
+
+# Clean generated stubs
+clean-stubs:
+    rm -rf stubs/
+
 # Setup development environment (install deps and pre-commit hooks)
 setup:
     uv sync --all-extras

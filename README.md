@@ -189,12 +189,27 @@ uv sync --upgrade
 - **`list_event_handlers`** - List supported event handlers for widgets
 - **`validate_widget_name`** - Validate widget names for Python naming conventions
 
-### Analysis Tools (Coming Soon)
+### Analysis Tools
 
-The following analysis tools are planned but not yet implemented:
+- **`detect_style_conflicts`** - Identify potential CSS conflicts and overlapping selectors
+  ```python
+  # Example: Detect conflicts in CSS
+  await client.call_tool("detect_style_conflicts", {
+      "css_content": """
+          Button { background: red; color: white; }
+          .primary { background: blue; }
+          Button.primary { color: black; }
+      """
+  })
+  ```
 
-- **`analyze_selectors`** - Analyze CSS selector usage and specificity (stub)
-- **`detect_style_conflicts`** - Identify potential CSS conflicts (stub)
+  Returns detailed analysis including:
+  - Conflicting property declarations between selectors
+  - Overlapping selectors with specificity scores
+  - Resolution suggestions for conflicts
+  - Summary of total conflicts and issues
+
+- **`analyze_selectors`** - Analyze CSS selector usage and specificity (planned)
 
 ### Documentation Tools
 

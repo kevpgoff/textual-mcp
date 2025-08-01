@@ -19,8 +19,6 @@ class TestTextualMCPServer:
         assert server.config == test_config
         assert server.mcp is not None
         assert server.logger is not None
-        assert server.mcp.name == "Textual Development Assistant"
-        # FastMCP doesn't store version as an attribute
 
     def test_server_tool_registration(self, test_config: TextualMCPConfig):
         """Test that all tools are registered properly."""

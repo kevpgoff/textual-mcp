@@ -313,6 +313,78 @@ The search system categorizes documentation into these types:
 - `css_reference` - CSS/styling documentation
 - `code` - Code blocks within documentation
 
+## Advanced Chunking with Chonkie
+
+The Textual MCP Server uses [Chonkie](https://github.com/chonkie-inc/chonkie) for intelligent document chunking, providing content-aware processing that preserves semantic coherence. This system adapts its chunking strategy based on content type:
+
+- **Code Examples**: Uses specialized code chunker that preserves code structure
+- **API Documentation**: Uses semantic chunking with larger chunks to keep class/method documentation together
+- **Guides**: Uses recursive markdown chunking that respects document structure
+- **CSS Reference**: Uses semantic chunking with smaller chunks for individual properties
+
+### Embedding Model Setup
+
+Chonkie's semantic chunking requires embedding models. To avoid runtime download issues, pre-initialize the models:
+
+```bash
+# Quick start - download and convert default models
+python scripts/init_embeddings.py
+```
+
+This will:
+1. Download required embedding models from Hugging Face
+2. Convert them to the efficient model2vec format
+3. Store them in the `models/` directory
+4. Create a model registry for easy lookup
+
+### Available Embedding Models
+
+The initialization script provides one model by default:
+- `minishlab/potion-base-8M` - Primary model for semantic chunking
+
+
+To add a custom model:
+```bash
+python scripts/init_embeddings.py --model "sentence-transformers/your-model" --output "your-model"
+```
+
+### Model Selection Priority
+
+The system automatically selects models in this order:
+1. Check for local pre-initialized models in `models/` directory
+2. Use cached models from `~/.cache/huggingface/hub/` or `~/.cache/sentence_transformers/`
+3. Fall back to downloading from Hugging Face
+
+### Configuration Options
+
+Control chunking behavior in `config/textual-mcp.yaml`:
+
+```yaml
+search:
+  chunking_strategy: 'chonkie'  # Use 'manual' to disable semantic chunking
+  # ... other settings
+```
+
+Set a custom models directory:
+```bash
+export TEXTUAL_MCP_MODELS_DIR=/path/to/your/models
+python scripts/init_embeddings.py
+```
+
+### Troubleshooting
+
+If you see the error:
+```
+"Folder does not exist locally, attempting to use huggingface hub."
+```
+
+This means models aren't initialized. Either:
+1. Run `python scripts/init_embeddings.py` (recommended)
+2. Ensure you have models cached from other projects
+3. Set `chunking_strategy: 'manual'` to use simpler chunking without embeddings
+
+The system gracefully falls back to simpler chunking methods if semantic models aren't available, ensuring functionality even without pre-downloaded models.
+
 ## Features
 
 - **Native Textual Integration**: Uses Textual's TCSS parser for 100% compatibility

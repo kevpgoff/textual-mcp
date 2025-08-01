@@ -65,32 +65,25 @@ packages = ["src/textual_mcp"]
 line-length = 100
 target-version = "py312"
 
-[tool.mypy]
-python_version = "3.12"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-mypy_path = "typings"
+[tool.ty]
+# Python version matches mypy config
+environment.python-version = "3.12"
 
-[[tool.mypy.overrides]]
-module = "chonkie.*"
-ignore_missing_imports = true
+# Configure source directories
+src.include = ["src"]
 
-[[tool.mypy.overrides]]
-module = "tokenizers.*"
-ignore_missing_imports = true
+# Enable strict type checking - no compromises
+[tool.ty.terminal]
+error-on-warning = true
 
-[[tool.mypy.overrides]]
-module = "qdrant_client.*"
-ignore_missing_imports = true
+# Only ignore unresolved imports for specific third-party modules that were ignored in mypy
+[[tool.ty.overrides]]
+include = ["**/*.py"]
 
-[[tool.mypy.overrides]]
-module = "vecs.*"
-ignore_missing_imports = true
+[tool.ty.overrides.rules]
+# Only ignore for modules that truly have no type stubs
+possibly-unresolved-reference = "warn"
 
-[[tool.mypy.overrides]]
-module = "vectordb.*"
-ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -104,11 +97,10 @@ en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/dow
 
 [dependency-groups]
 dev = [
-    "mypy>=1.17.0",
     "pre-commit>=4.2.0",
     "pytest>=8.4.1",
     "pytest-asyncio>=1.1.0",
     "pytest-cov>=6.2.1",
     "ruff>=0.12.7",
-    "types-pyyaml>=6.0.12.20250516",
+    "ty>=0.0.1a16",
 ]

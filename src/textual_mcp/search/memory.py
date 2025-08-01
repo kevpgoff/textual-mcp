@@ -36,7 +36,7 @@ class TextualDocsMemory:
         self.logger = get_logger("textual_docs_memory")
 
         # Initialize VectorDB with proper parameters
-        memory_file = str(persist_path) if persist_path else None
+        memory_file = str(persist_path) if persist_path else ""
         self.memory: Memory = Memory(memory_file=memory_file, embeddings=embeddings)
         self.embeddings = embeddings
         self.persist_path = persist_path

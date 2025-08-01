@@ -284,9 +284,9 @@ def register_documentation_tools(mcp: Any, config: TextualMCPConfig) -> None:
                     processor.set_github_token(config.search.github_token)
 
                 # Check rate limit before indexing
+                logger = get_logger("index_textual_docs")
                 try:
                     rate_info = await processor.check_rate_limit()
-                    logger = get_logger("index_textual_docs")
                     logger.info(
                         f"GitHub API rate limit: {rate_info['remaining']}/{rate_info['limit']}"
                     )

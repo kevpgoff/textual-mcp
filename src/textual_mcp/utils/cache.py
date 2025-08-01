@@ -3,14 +3,12 @@
 import time
 import threading
 from typing import Any, Dict, Optional, Tuple, Generic, TypeVar, Callable, cast
-from typing_extensions import ParamSpec
 from collections import OrderedDict
 from functools import wraps
 from hashlib import md5
 
 K = TypeVar("K")
 V = TypeVar("V")
-P = ParamSpec("P")
 R = TypeVar("R")
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -124,12 +122,12 @@ def cache_key(*args: Any, **kwargs: Any) -> str:
     return md5(key_string.encode()).hexdigest()
 
 
-class CachedFunctionWrapper(Generic[P, R]):
+class CachedFunctionWrapper(Generic[R]):
     """Wrapper for cached functions with cache management methods."""
 
     def __init__(
         self,
-        func: Callable[P, R],
+        func: Callable[..., R],
         cache: LRUCache[str, Any],
         key_func: Optional[Callable[..., str]] = None,
     ):
@@ -144,7 +142,7 @@ class CachedFunctionWrapper(Generic[P, R]):
         }
         wraps(func)(self)
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+    def __call__(self, *args: Any, **kwargs: Any) -> R:
         # Generate cache key
         if self._key_func:
             key = self._key_func(*args, **kwargs)
@@ -164,7 +162,7 @@ class CachedFunctionWrapper(Generic[P, R]):
 
 def cached(
     cache: LRUCache[str, Any], key_func: Optional[Callable[..., str]] = None
-) -> Callable[[Callable[P, R]], CachedFunctionWrapper[P, R]]:
+) -> Callable[[F], F]:
     """
     Decorator to cache function results.
 
@@ -173,8 +171,9 @@ def cached(
         key_func: Function to generate cache key (default: use cache_key)
     """
 
-    def decorator(func: Callable[P, R]) -> CachedFunctionWrapper[P, R]:
-        return CachedFunctionWrapper(func, cache, key_func)
+    def decorator(func: F) -> F:
+        wrapper = CachedFunctionWrapper(func, cache, key_func)
+        return cast(F, wrapper)
 
     return decorator
 

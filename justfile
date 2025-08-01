@@ -19,13 +19,13 @@ check:
     ruff check .
     ruff format --check .
 
-# Run type checking with mypy
+# Run type checking with ty
 typecheck:
-    {{python}} -m mypy src/textual_mcp/
+    {{python}} -m ty check src/textual_mcp/
 
-# Run mypy on specific file or directory
+# Run ty on specific file or directory
 typecheck-file path:
-    {{python}} -m mypy {{path}}
+    {{python}} -m ty check {{path}}
 
 # Run all checks (lint, format, and type checking)
 check-all: check typecheck
@@ -83,16 +83,6 @@ pre-commit-update:
 pre-commit-check:
     uv run pre-commit run --all-files --show-diff-on-failure
 
-# Generate type stubs for untyped dependencies
-generate-stubs:
-    @echo "Generating type stubs for untyped dependencies..."
-    mkdir -p stubs
-    {{python}} -m mypy.stubgen -p vectordb -o stubs/ 2>/dev/null || true
-    @echo "Type stubs generated in stubs/"
-
-# Clean generated stubs
-clean-stubs:
-    rm -rf stubs/
 
 # Setup development environment (install deps and pre-commit hooks)
 setup:

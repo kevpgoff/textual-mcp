@@ -134,7 +134,8 @@ def main() -> None:
         os.environ["LOG_LEVEL"] = args.log_level
 
     server = create_server(args.config)
-    server.run()
+    # FastMCP handles the asyncio loop - just run the mcp directly
+    server.mcp.run()
 
 
 if __name__ == "__main__":

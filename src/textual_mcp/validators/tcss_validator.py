@@ -20,6 +20,7 @@ except ImportError as e:
 from ..utils.errors import ValidationError, ParsingError
 from ..utils.logging_config import LoggerMixin, log_validation_result
 from ..config import ValidatorConfig
+from .property_validator import TextualPropertyValidator
 
 
 @dataclass
@@ -52,6 +53,7 @@ class TCSSValidator(LoggerMixin):
     def __init__(self, config: ValidatorConfig):
         self.config = config
         self.strict_mode = config.strict_mode
+        self.property_validator = TextualPropertyValidator()
 
     def validate(self, css_content: str, filename: Optional[str] = None) -> ValidationResult:
         """
@@ -138,6 +140,19 @@ class TCSSValidator(LoggerMixin):
             # Perform semantic validation if no parsing errors
             if not errors:
                 self._semantic_validation(css_content, warnings, suggestions)
+
+            # Always perform property validation (even if there were parsing errors)
+            # This catches invalid properties and values that the parser accepts
+            property_errors = self.property_validator.validate_css_content(css_content)
+            for prop_error in property_errors:
+                errors.append(
+                    ValidationError(
+                        message=prop_error.message,
+                        line=prop_error.line,
+                        column=prop_error.column,
+                        property_name=prop_error.property_name,
+                    )
+                )
 
         except Exception as e:
             self.logger.error(f"Validation failed: {e}")

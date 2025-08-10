@@ -6,6 +6,11 @@ from collections import defaultdict
 
 try:
     from textual.css.parse import parse
+    from textual.css.errors import (
+        StylesheetError,
+        DeclarationError,
+        UnresolvedVariableError,
+    )
 except ImportError as e:
     raise ImportError(f"Failed to import Textual CSS components: {e}")
 
@@ -538,8 +543,15 @@ class ConflictDetector(LoggerMixin):
             else:
                 variable_tokens = None
 
-            # Parse stylesheet
-            stylesheet = parse("*", css_content, ("inline", "0"), variable_tokens=variable_tokens)
+            # Parse stylesheet - this will raise errors if CSS is invalid
+            try:
+                stylesheet = parse(
+                    "*", css_content, ("inline", "0"), variable_tokens=variable_tokens
+                )
+            except (StylesheetError, DeclarationError, UnresolvedVariableError) as e:
+                # CSS parsing error - re-raise it to be handled by the caller
+                self.logger.error(f"CSS parsing error: {e}")
+                raise
 
             # Extract rules and build data structures
             rules = []
@@ -703,6 +715,13 @@ class ConflictDetector(LoggerMixin):
                         }
                     )
 
+        except (StylesheetError, DeclarationError, UnresolvedVariableError) as e:
+            # CSS parsing errors should be reported clearly
+            self.logger.error(f"CSS parsing failed: {e}")
+            # Add the parsing error to the result so it's visible to the user
+            result.resolution_suggestions.append(f"CSS parsing error: {str(e)}")
+            # Also mark this as a critical issue
+            result.property_conflicts["parsing_errors"] = [str(e)]
         except Exception as e:
             self.logger.error(f"Conflict analysis failed: {e}")
             result.resolution_suggestions.append(f"Analysis error: {str(e)}")
